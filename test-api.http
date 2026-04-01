@@ -1,0 +1,50 @@
+@baseUrl = http://127.0.0.1:8000/api/v1
+
+### Register Customer
+POST {{baseUrl}}/auth/register/customer
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "John Customer",
+  "email": "customer@test.com",
+  "password": "password123",
+  "phone": "01012345678"
+}
+
+### Login with Correct Credentials (after registering customer above)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "customer@test.com",
+    "password": "password123"
+}
+
+### Login with WRONG Credentials (should return 422)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "customer@test.com",
+  "password": "wrongpassword"
+}
+
+### Register Vendor
+POST {{baseUrl}}/auth/register/vendor
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Ahmed Vendor",
+  "email": "vendor@test.com",
+  "password": "password123",
+  "phone": "01098765432",
+  "company_name": "Fresh Farms Co.",
+  "commercial_register": "CR123456",
+  "governorate": "Cairo",
+  "address": "123 Farm Street",
+  "primary_category": "vegetables"
+}

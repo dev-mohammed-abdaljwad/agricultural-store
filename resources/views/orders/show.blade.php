@@ -1,0 +1,386 @@
+@extends('layouts.app')
+
+@section('title', 'طلب #' . $order->order_number . ' - نيل هارفست')
+
+@section('content')
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-md flex flex-row-reverse justify-between items-center px-4 sm:px-6 md:px-8 h-16 shadow-sm">
+    <div class="flex items-center gap-4 sm:gap-6 md:gap-8">
+        <a href="{{ route('home') }}" class="text-xl sm:text-2xl font-black text-primary tracking-tight font-headline">
+            Nile Harvest
+        </a>
+        <div class="hidden lg:flex flex-row-reverse items-center gap-4 md:gap-6">
+            <a class="text-on-surface-variant hover:text-primary font-headline font-bold text-sm md:text-lg transition-colors duration-200" href="{{ route('home') }}">الرئيسية</a>
+            <a class="text-on-surface-variant hover:text-primary font-headline font-bold text-sm md:text-lg transition-colors duration-200" href="{{ route('products.index') }}">السوق</a>
+            <a class="text-primary font-headline font-bold text-sm md:text-lg transition-colors duration-200" href="{{ route('dashboard') }}">طلباتي</a>
+        </div>
+    </div>
+    
+    <div class="flex items-center gap-2 sm:gap-3 md:gap-4">
+        <a href="{{ route('dashboard') }}" class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-95">
+            <span class="material-symbols-outlined text-xl sm:text-2xl">shopping_cart</span>
+        </a>
+        <form method="POST" action="{{ route('logout') }}" class="inline">
+            @csrf
+            <button type="submit" class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-95">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">logout</span>
+            </button>
+        </form>
+    </div>
+</nav>
+
+<main class="pt-20 sm:pt-24 pb-12 px-4 sm:px-6 md:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Flash Messages -->
+        @if(session('success'))
+            <div class="mb-8 p-3 sm:p-4 bg-success-container text-on-success-container rounded-lg border-r-4 border-success flex items-center gap-2 sm:gap-3 text-xs sm:text-base" role="alert">
+                <span class="material-symbols-outlined text-xl sm:text-2xl flex-shrink-0">check_circle</span>
+                <p>{{ session('success') }}</p>
+            </div>
+        @endif
+        
+        @if(session('error'))
+            <div class="mb-8 p-3 sm:p-4 bg-error/10 text-error rounded-lg border-r-4 border-error flex items-center gap-2 sm:gap-3 text-xs sm:text-base" role="alert">
+                <span class="material-symbols-outlined text-xl sm:text-2xl flex-shrink-0">error</span>
+                <p>{{ session('error') }}</p>
+            </div>
+        @endif
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row-reverse sm:justify-between sm:items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="flex-1">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-primary font-headline mb-1 sm:mb-2">الطلب {{ $order->order_number }}</h1>
+                <p class="text-on-surface-variant text-xs sm:text-base">
+                    تاريخ الطلب: {{ $order->created_at->format('d M Y') }}
+                </p>
+            </div>
+            <span class="px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm md:text-base flex-shrink-0 whitespace-nowrap
+                @if($order->status === 'pending') bg-warning text-on-warning
+                @elseif($order->status === 'quote_pending') bg-info text-on-info
+                @elseif($order->status === 'confirmed') bg-success text-on-success
+                @elseif($order->status === 'shipped') bg-secondary text-on-secondary
+                @elseif($order->status === 'delivered') bg-primary text-on-primary
+                @elseif($order->status === 'rejected') bg-error text-on-error
+                @else bg-surface-container text-on-surface
+                @endif">
+                @switch($order->status)
+                    @case('pending')
+                        قيد المراجعة
+                        @break
+                    @case('quote_pending')
+                        في انتظار عرض السعر
+                        @break
+                    @case('confirmed')
+                        تم التأكيد
+                        @break
+                    @case('shipped')
+                        قيد الشحن
+                        @break
+                    @case('delivered')
+                        تم التسليم
+                        @break
+                    @case('rejected')
+                        تم الرفض
+                        @break
+                    @default
+                        {{ $order->status }}
+                @endswitch
+            </span>
+        </div>
+
+        <!-- Order Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+            <!-- Left: Order Items & Quote -->
+            <div class="lg:col-span-2 space-y-6 sm:space-y-8">
+                <!-- Order Items -->
+                <section class="bg-surface-container-high rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 editorial-shadow">
+                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-primary font-headline mb-4 sm:mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg sm:text-2xl">shopping_bag</span>
+                        تفاصيل الطلب
+                    </h2>
+                    
+                    <div class="space-y-4 sm:space-y-6">
+                        @foreach($order->items as $item)
+                            <div class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-outline-variant/15 last:border-b-0">
+                                @if($item->product->images->first())
+                                    <img src="{{ $item->product->images->first()->asset_url }}" alt="{{ $item->product->name }}"
+                                         class="w-full sm:w-20 h-32 sm:h-20 object-cover rounded-lg flex-shrink-0">
+                                @else
+                                    <div class="w-full sm:w-20 h-32 sm:h-20 bg-surface-container rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant">image</span>
+                                    </div>
+                                @endif
+                                
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold text-base sm:text-lg text-on-surface mb-1 sm:mb-2 truncate">{{ $item->product->name }}</h3>
+                                    <p class="text-on-surface-variant text-xs sm:text-sm mb-2 sm:mb-3">
+                                        {{ $item->product->category->name }}
+                                    </p>
+                                    <div class="flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm">
+                                        <span class="font-medium text-on-surface">
+                                            الكمية: <span class="font-bold text-primary">{{ $item->quantity }}</span> {{ $item->product->unit }}
+                                        </span>
+                                        @if($item->unit_price)
+                                            <span class="text-on-surface-variant">
+                                                السعر: <span class="font-bold text-primary">{{ number_format($item->unit_price) }}</span> ج.م/{{ $item->product->unit }}
+                                            </span>
+                                        @else
+                                            <span class="text-on-surface-variant">السعر: قيد التحديد</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                @if($item->total_price)
+                                    <div class="text-right flex-shrink-0">
+                                        <p class="text-on-surface-variant text-xs sm:text-sm mb-1">الإجمالي</p>
+                                        <p class="font-bold text-lg sm:text-xl text-primary">{{ number_format($item->total_price) }} ج.م</p>
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+
+                <!-- Pricing Quote (if exists) -->
+                @if($order->quote)
+                    <section class="bg-primary-fixed rounded-2xl p-8">
+                        <h2 class="text-2xl font-bold text-primary font-headline mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined">request_quote</span>
+                            عرض السعر
+                        </h2>
+                        
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-center justify-between py-3 border-b border-primary/20 last:border-b-0">
+                                <span class="text-on-surface">إجمالي البضاعة:</span>
+                                <span class="font-bold text-lg text-primary">
+                                    {{ number_format($order->items->reduce(fn($carry, $item) => $carry + ($item->total_price ?? 0), 0)) }} ج.م
+                                </span>
+                            </div>
+                            @if($order->quote->delivery_fee)
+                                <div class="flex items-center justify-between py-3 border-b border-primary/20">
+                                    <span class="text-on-surface flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-xl">local_shipping</span>
+                                        مصاريف الشحن:
+                                    </span>
+                                    <span class="font-bold text-lg text-primary">{{ number_format($order->quote->delivery_fee) }} ج.م</span>
+                                </div>
+                            @endif
+                            <div class="flex items-center justify-between py-4 bg-on-primary/10 rounded-lg px-4">
+                                <span class="font-bold text-lg text-on-surface">الإجمالي:</span>
+                                <span class="font-black text-2xl text-primary">{{ number_format($order->quote->total_amount) }} ج.م</span>
+                            </div>
+                        </div>
+
+                        @if($order->quote->notes)
+                            <div class="bg-on-primary/5 rounded-lg p-4 mb-6">
+                                <p class="text-sm text-on-surface-variant font-medium mb-2">ملاحظات:</p>
+                                <p class="text-on-surface">{{ $order->quote->notes }}</p>
+                            </div>
+                        @endif
+
+                        @if($order->quote->expires_at)
+                            <p class="text-on-surface-variant text-sm">
+                                صلاحية العرض: {{ $order->quote->expires_at->format('d M Y H:i') }}
+                            </p>
+                        @endif
+
+                        <!-- Quote Actions -->
+                        @if($order->quote->status === 'pending')
+                            <div class="flex flex-col gap-3 mt-8">
+                                <form method="POST" action="{{ route('orders.quote.accept', [$order->id, $order->quote->id]) }}">
+                                    @csrf
+                                    <button type="submit" class="w-full py-3 bg-success text-on-success font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined">check_circle</span>
+                                        وافق على العرض
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('orders.quote.reject', [$order->id, $order->quote->id]) }}">
+                                    @csrf
+                                    <button type="submit" class="w-full py-3 bg-error text-on-error font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined">cancel</span>
+                                        رفض العرض
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <div class="mt-6 p-4 bg-on-primary/10 rounded-lg text-center">
+                                <p class="text-on-surface font-medium">
+                                    حالة العرض: 
+                                    <span class="font-bold text-primary">
+                                        @if($order->quote->status === 'accepted')
+                                            تم قبوله
+                                        @elseif($order->quote->status === 'rejected')
+                                            تم رفضه
+                                        @else
+                                            {{ $order->quote->status }}
+                                        @endif
+                                    </span>
+                                </p>
+                            </div>
+                        @endif
+                    </section>
+                @endif
+
+                <!-- Delivery Information -->
+                <section class="bg-surface-container-high rounded-2xl p-8 editorial-shadow">
+                    <h2 class="text-2xl font-bold text-primary font-headline mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined">location_on</span>
+                        معلومات التوصيل
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-on-surface-variant text-sm mb-1">الاسم:</p>
+                            <p class="font-bold text-on-surface">{{ $order->delivery_name ?? Auth::user()->name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-on-surface-variant text-sm mb-1">الهاتف:</p>
+                            <p class="font-bold text-on-surface">{{ $order->delivery_phone ?? Auth::user()->phone }}</p>
+                        </div>
+                        <div>
+                            <p class="text-on-surface-variant text-sm mb-1">العنوان:</p>
+                            <p class="font-bold text-on-surface">{{ $order->delivery_address ?? Auth::user()->address }}</p>
+                        </div>
+                        <div>
+                            <p class="text-on-surface-variant text-sm mb-1">المحافظة:</p>
+                            <p class="font-bold text-on-surface">{{ $order->delivery_governorate ?? Auth::user()->governorate }}</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right: Timeline & Info -->
+            <div class="space-y-8">
+                <!-- Status Timeline -->
+                <section class="bg-surface-container-high rounded-2xl p-8 editorial-shadow">
+                    <h2 class="text-xl font-bold text-primary font-headline mb-6">سير المعاملة</h2>
+                    
+                    <div class="relative space-y-4">
+                        @php
+                            $statuses = [
+                                'pending' => ['عرض السعر', 'pending'],
+                                'quote_pending' => ['في انتظار العرض', 'quote_pending'],
+                                'confirmed' => ['تم التأكيد', 'confirmed'],
+                                'shipped' => ['قيد الشحن', 'shipped'],
+                                'delivered' => ['تم التسليم', 'delivered'],
+                            ];
+                            $statusOrder = array_keys($statuses);
+                            $currentIndex = array_search($order->status, $statusOrder);
+                        @endphp
+
+                        @foreach($statusOrder as $idx => $status)
+                            <div class="flex gap-4 items-start relative">
+                                <!-- Timeline Dot -->
+                                <div class="relative flex flex-col items-center">
+                                    <div class="w-3 h-3 rounded-full mt-2 {{ $idx <= $currentIndex ? 'bg-primary' : 'bg-outline-variant' }}"></div>
+                                    @if($idx < count($statusOrder) - 1)
+                                        <div class="w-0.5 h-12 {{ $idx < $currentIndex ? 'bg-primary' : 'bg-outline-variant' }}"></div>
+                                    @endif
+                                </div>
+                                
+                                <!-- Status Text -->
+                                <div class="pt-1">
+                                    <p class="font-bold {{ $idx <= $currentIndex ? 'text-primary' : 'text-on-surface-variant' }}">
+                                        {{ $statuses[$status][0] }}
+                                    </p>
+                                    @if($idx <= $currentIndex)
+                                        <p class="text-xs text-on-surface-variant mt-1">
+                                            تم {{ $order->created_at->format('d/m/Y') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+
+                <!-- Quick Info -->
+                <section class="bg-surface-container-high rounded-2xl p-8 editorial-shadow">
+                    <h2 class="text-xl font-bold text-primary font-headline mb-6">المعلومات</h2>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div class="flex items-center justify-between py-3 border-b border-outline-variant/15">
+                            <span class="text-on-surface-variant">رقم الطلب:</span>
+                            <span class="font-mono font-bold text-on-surface">{{ $order->order_number }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-outline-variant/15">
+                            <span class="text-on-surface-variant">تاريخ الطلب:</span>
+                            <span class="font-bold text-on-surface">{{ $order->created_at->format('d M Y') }}</span>
+                        </div>
+                        @if($order->tracking)
+                            <div class="flex items-center justify-between py-3">
+                                <span class="text-on-surface-variant">رقم التتبع:</span>
+                                <span class="font-mono font-bold text-primary">{{ $order->tracking->tracking_number }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if($order->notes)
+                        <div class="mt-6 p-4 bg-on-primary/5 rounded-lg border-r-4 border-primary">
+                            <p class="text-xs text-on-surface-variant font-medium mb-2">ملاحظات:</p>
+                            <p class="text-sm text-on-surface">{{ $order->notes }}</p>
+                        </div>
+                    @endif
+                </section>
+
+                <!-- Contact Support -->
+                <section class="bg-secondary-fixed rounded-2xl p-8">
+                    <h2 class="text-lg font-bold text-secondary font-headline mb-4">هل تحتاج مساعدة؟</h2>
+                    <p class="text-on-surface text-sm mb-6">
+                        يمكنك التواصل مع فريق الدعم الخاص بنا أو مراسلة الإدارة مباشرة من خلال قسم الرسائل.
+                    </p>
+                    <a href="{{ route('dashboard') }}" class="block text-center py-2 px-4 bg-secondary text-on-secondary font-bold rounded-lg hover:opacity-90 transition-all">
+                        اذهب إلى الرسائل
+                    </a>
+                </section>
+            </div>
+        </div>
+
+        <!-- Messages/Chat Section -->
+        @if($order->conversations->first())
+            <section class="bg-surface-container-high rounded-2xl p-8 editorial-shadow">
+                <h2 class="text-2xl font-bold text-primary font-headline mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined">chat</span>
+                    الرسائل
+                </h2>
+
+                <div class="space-y-4 max-h-96 overflow-y-auto mb-6 p-4 bg-surface-container rounded-lg">
+                    @foreach($order->conversations->first()->messages ?? [] as $message)
+                        <div class="flex {{ $message->sender_id === Auth::id() ? 'flex-row-reverse' : 'flex-row' }} gap-4">
+                            @if($message->sender_id === Auth::id())
+                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-sm text-on-primary">person</span>
+                                </div>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-sm text-on-secondary">support_agent</span>
+                                </div>
+                            @endif
+                            
+                            <div class="{{ $message->sender_id === Auth::id() ? 'flex-row-reverse' : 'flex-row' }} flex-1 space-x-2">
+                                <div class="{{ $message->sender_id === Auth::id() ? 'bg-primary text-on-primary ml-auto' : 'bg-surface-container-high' }} p-4 rounded-lg max-w-xs">
+                                    <p class="text-sm">{{ $message->content }}</p>
+                                </div>
+                                <p class="text-xs text-on-surface-variant pt-1">
+                                    {{ $message->created_at->format('H:i') }}
+                                </p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Message Input -->
+                <form method="POST" action="{{ route('orders.messages.create', $order->id) }}" class="flex gap-3">
+                    @csrf
+                    <input type="text" name="message" placeholder="أكتب رسالتك..." class="flex-1 px-4 py-3 bg-surface-container rounded-lg border border-outline-variant focus:border-primary outline-none transition-colors" required>
+                    <button type="submit" class="px-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </form>
+            </section>
+        @endif
+    </div>
+</main>
+
+<!-- Footer -->
+<x-footer />
+@endsection
