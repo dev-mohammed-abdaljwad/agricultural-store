@@ -1,23 +1,40 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
-    protected $fillable = ['conversation_id', 'sender_id', 'sender_type', 'body', 'is_read'];
+    protected $fillable = [
+        'conversation_id',
+        'sender_id',
+        'sender_type',
+        'body',
+        'attachment_url',
+        'attachment_type',
+        'is_read',
+    ];
 
-    protected $casts = ['is_read' => 'boolean'];
+    protected $casts = [
+        'is_read' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
-    public function conversation()
+    /**
+     * Get the conversation this message belongs to.
+     */
+    public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
     }
 
-    public function sender()
+    /**
+     * Get the sender (user) of this message.
+     */
+    public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
     }

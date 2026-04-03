@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -11,7 +12,7 @@ use App\Traits\HasRole;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, SoftDeletes, HasRole;
+    use HasApiTokens, HasFactory, SoftDeletes, HasRole;
 
     protected $fillable = [
         'name', 'email', 'phone', 'password',
@@ -26,6 +27,11 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(Cart::class);
     }
 
     public function conversations()

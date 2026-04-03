@@ -130,12 +130,18 @@
                 <span>لوحة التحكم</span>
             </a>
 
-            <a href="#"
+            <a href="{{ route('admin.orders.index') }}"
                class="flex items-center gap-3 px-6 py-3 text-sm font-headline transition-colors rounded-l-xl flex-row-reverse
-                      text-white/60 hover:text-white hover:bg-white/5 relative">
+                      {{ request()->routeIs('admin.orders*') ? 'bg-white/10 text-white font-bold border-r-4 border-primary-fixed' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <span class="material-symbols-outlined">receipt_long</span>
                 <span>الطلبات</span>
-                <span class="absolute left-6 top-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">12</span>
+            </a>
+
+            <a href="{{ route('admin.quotes.index') }}"
+               class="flex items-center gap-3 px-6 py-3 text-sm font-headline transition-colors rounded-l-xl flex-row-reverse
+                      {{ request()->routeIs('admin.quotes*') ? 'bg-white/10 text-white font-bold border-r-4 border-primary-fixed' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
+                <span class="material-symbols-outlined">local_offer</span>
+                <span>عروض الأسعار</span>
             </a>
 
             <a href="{{ route('admin.products.index') }}"
@@ -145,31 +151,31 @@
                 <span>المنتجات</span>
             </a>
 
-            <a href="#"
+            <a href="{{ route('admin.chat.index') }}"
                class="flex items-center gap-3 px-6 py-3 text-sm font-headline transition-colors rounded-l-xl flex-row-reverse
-                      text-white/60 hover:text-white hover:bg-white/5 relative">
+                      {{ request()->routeIs('chat.*') ? 'bg-white/10 text-white font-bold border-r-4 border-primary-fixed' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <span class="material-symbols-outlined">chat_bubble</span>
                 <span>المحادثات</span>
                 <span class="absolute left-6 top-2 bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">5</span>
             </a>
 
-            <a href="#"
+            <a href="{{ route('admin.delivery-agents.index') }}"
                class="flex items-center gap-3 px-6 py-3 text-sm font-headline transition-colors rounded-l-xl flex-row-reverse
-                      text-white/60 hover:text-white hover:bg-white/5">
+                      {{ request()->routeIs('admin.delivery-agents*') ? 'bg-white/10 text-white font-bold border-r-4 border-primary-fixed' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <span class="material-symbols-outlined">local_shipping</span>
-                <span>التوصيل</span>
+                <span>عمال التوصيل</span>
             </a>
 
-            <a href="#"
+            <a href="{{ route('admin.users.index') }}"
                class="flex items-center gap-3 px-6 py-3 text-sm font-headline transition-colors rounded-l-xl flex-row-reverse
-                      text-white/60 hover:text-white hover:bg-white/5">
+                      {{ request()->routeIs('admin.users*') ? 'bg-white/10 text-white font-bold border-r-4 border-primary-fixed' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <span class="material-symbols-outlined">group</span>
                 <span>العملاء</span>
             </a>
 
-            <a href="#"
+            <a href="{{ route('admin.analytics') }}"
                class="flex items-center gap-3 px-6 py-3 text-sm font-headline transition-colors rounded-l-xl flex-row-reverse
-                      text-white/60 hover:text-white hover:bg-white/5">
+                      {{ request()->routeIs('admin.analytics') ? 'bg-white/10 text-white font-bold border-r-4 border-primary-fixed' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <span class="material-symbols-outlined">bar_chart</span>
                 <span>التقارير</span>
             </a>

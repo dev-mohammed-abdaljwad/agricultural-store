@@ -636,7 +636,10 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::create(['name' => $category]);
+            Category::updateOrCreate(
+                ['name' => $category],
+                ['is_active' => true]
+            );
         }
 
         $this->command->info("✓ تم إنشاء الفئات الأساسية");

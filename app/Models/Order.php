@@ -16,7 +16,7 @@ class Order extends Model
         'delivery_fee', 'total_amount',
         'payment_method', 'payment_status',
         'supplier_ref', 'admin_notes',
-        'delivery_address', 'delivery_governorate',
+        'delivery_address', 'delivery_governorate', 'delivery_phone',
     ];
 
     protected static function booted(): void
@@ -66,5 +66,36 @@ class Order extends Model
     public function conversations()
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    public function deliveryAssignment()
+    {
+        return $this->hasOne(DeliveryAssignment::class)->latest();
+    }
+
+    public function deliveryAssignments()
+    {
+        return $this->hasMany(DeliveryAssignment::class)->latest();
+    }
+
+    /**
+     * Get human-readable status label
+     */
+    public function getStatusLabel(): string
+    {
+        return match($this->status) {
+            'placed' => 'تم عمل الطلب',
+            'quote_pending' => 'في انتظار عرض سعر',
+            'quote_sent' => 'تم إرسال عرض السعر',
+            'quote_accepted' => 'تم قبول العرض',
+            'quote_rejected' => 'تم رفض العرض',
+            'paid' => 'تم الدفع',
+            'preparing' => 'قيد التحضير',
+            'out_for_delivery' => 'جاري التوصيل',
+            'delivered' => 'تم الاستلام',
+            'cancelled' => 'تم الإلغاء',
+            'returned' => 'تم الإرجاع',
+            default => $this->status,
+        };
     }
 }

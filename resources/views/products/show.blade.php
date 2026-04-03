@@ -1,80 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
-@section('title', $product->name . ' - The Fertile Estate')
+@section('title', $product->name . ' - نيل هارفست')
 
 @section('content')
-<div class="bg-surface min-h-screen" lang="ar" dir="rtl">
-    <!-- NAVBAR (Fixed Top) -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-md border-b border-[#e3e3de]/15 shadow-sm">
-        <div class="max-w-[1440px] mx-auto px-6 py-4 flex items-center justify-between">
-            <!-- Right: Brand -->
-            <div class="flex-shrink-0">
-                <h1 class="italic font-black text-primary text-2xl font-headline">The Fertile Estate</h1>
-            </div>
-
-            <!-- Center: Desktop Navigation (Hidden on Mobile) -->
-            <div class="hidden md:flex gap-8 items-center">
-                <a href="#" class="text-on-surface-variant hover:text-primary transition-colors">Vendor Portal</a>
-                <a href="#" class="text-primary border-b-4 border-primary-fixed pb-2 font-bold">Products</a>
-                <a href="#" class="text-on-surface-variant hover:text-primary transition-colors">My Orders</a>
-            </div>
-
-            <!-- Left: Icon Buttons -->
-            <div class="flex gap-4 items-center">
-                <button class="text-primary hover:text-primary-container transition-colors">
-                    <span class="material-symbols-outlined">language</span>
-                </button>
-                <button class="text-primary hover:text-primary-container transition-colors">
-                    <span class="material-symbols-outlined">shopping_cart</span>
-                </button>
-                <button class="text-primary hover:text-primary-container transition-colors">
-                    <span class="material-symbols-outlined">account_circle</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="flex">
-        <!-- SIDEBAR (Desktop Only) -->
-        <aside class="hidden lg:flex w-64 flex-col fixed right-0 top-16 h-[calc(100vh-64px)] bg-surface border-l border-[#e3e3de]/15 p-6">
-            <div class="mb-8">
-                <h2 class="text-lg font-bold text-primary font-headline">Welcome, Farmer</h2>
-                <p class="text-on-surface-variant text-xs mt-1">Verified Egyptian Producer</p>
-            </div>
-
-            <nav class="space-y-2 flex-1">
-                <!-- Active Item -->
-                <div class="flex items-center gap-3 flex-row-reverse bg-primary-fixed text-primary rounded-l-full font-bold pr-6 py-3">
-                    <span class="material-symbols-outlined">pest_control</span>
-                    <span class="font-headline">Pesticides</span>
-                </div>
-
-                <!-- Inactive Items -->
-                <a href="#" class="flex items-center gap-3 flex-row-reverse text-on-surface-variant pr-6 py-3 hover:bg-surface-container-low rounded-l-full transition-transform hover:translate-x-[-4px] duration-200">
-                    <span class="material-symbols-outlined">park</span>
-                    <span class="font-headline">Crops</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 flex-row-reverse text-on-surface-variant pr-6 py-3 hover:bg-surface-container-low rounded-l-full transition-transform hover:translate-x-[-4px] duration-200">
-                    <span class="material-symbols-outlined">factory</span>
-                    <span class="font-headline">Manufacturers</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 flex-row-reverse text-on-surface-variant pr-6 py-3 hover:bg-surface-container-low rounded-l-full transition-transform hover:translate-x-[-4px] duration-200">
-                    <span class="material-symbols-outlined">agriculture</span>
-                    <span class="font-headline">Fertilizers</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 flex-row-reverse text-on-surface-variant pr-6 py-3 hover:bg-surface-container-low rounded-l-full transition-transform hover:translate-x-[-4px] duration-200">
-                    <span class="material-symbols-outlined">shield_with_heart</span>
-                    <span class="font-headline">Safety Gear</span>
-                </a>
-            </nav>
-
-            <button class="w-full bg-primary text-on-primary py-3 rounded-md font-bold text-sm hover:bg-primary-container transition-colors">
-                Request Consultation
-            </button>
-        </aside>
-
-        <!-- MAIN CONTENT -->
-        <main class="flex-1 lg:pr-64 pt-24 pb-20 md:pb-12 px-6 max-w-[1440px] mx-auto w-full">
+<div class="min-h-screen">
             <!-- BREADCRUMB -->
             <nav class="flex items-center gap-2 flex-row-reverse text-on-surface-variant text-sm mb-8">
                 <span class="text-primary font-bold">{{ $product->name }}</span>
@@ -153,26 +82,27 @@
                         @endif
 
                         <!-- Quantity Section -->
-                        <div class="space-y-3">
+                        <form action="{{ route('cart.add', $product) }}" method="POST" class="space-y-3">
+                            @csrf
                             <label class="text-sm font-bold text-on-surface">الكمية ({{ $product->unit ?? 'عبوة' }})</label>
                             <div class="flex items-center gap-4">
                                 <div class="flex bg-surface-container-highest rounded-md overflow-hidden flex-row-reverse">
-                                    <button class="p-3 hover:bg-outline-variant transition-colors">
+                                    <button type="button" class="p-3 hover:bg-outline-variant transition-colors" onclick="decreaseQty()">
                                         <span class="material-symbols-outlined text-sm">remove</span>
                                     </button>
-                                    <input type="number" value="{{ $product->min_order_qty ?? 1 }}" 
+                                    <input type="number" id="quantity" name="quantity" value="{{ $product->min_order_qty ?? 1 }}" 
                                            min="{{ $product->min_order_qty ?? 1 }}"
                                            class="w-16 text-center font-bold bg-transparent outline-none">
-                                    <button class="p-3 hover:bg-outline-variant transition-colors">
+                                    <button type="button" class="p-3 hover:bg-outline-variant transition-colors" onclick="increaseQty()">
                                         <span class="material-symbols-outlined text-sm">add</span>
                                     </button>
                                 </div>
-                                <button class="flex-1 bg-primary text-on-primary py-4 rounded-md font-black flex items-center justify-center gap-2 hover:bg-primary-container active:scale-95 shadow-md transition-all">
+                                <button type="submit" class="flex-1 bg-primary text-on-primary py-4 rounded-md font-black flex items-center justify-center gap-2 hover:bg-primary-container active:scale-95 shadow-md transition-all">
                                     <span class="material-symbols-outlined">shopping_cart</span>
                                     إضافة إلى السلة
                                 </button>
                             </div>
-                        </div>
+                        </form>
 
                         <!-- Shipping Info Box -->
                         <div class="bg-surface-container-highest/50 p-4 rounded-lg border-r-4 border-tertiary space-y-3">
@@ -238,10 +168,14 @@
                             
                             @if(isset($product->expert_name))
                                 <div class="flex items-center gap-4 flex-row-reverse mt-6">
-                                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed flex-shrink-0">
-                                        <img src="{{ $product->expert_image_url ?? 'https://via.placeholder.com/48' }}" 
-                                             alt="{{ $product->expert_name }}"
-                                             class="w-full h-full object-cover">
+                                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-fixed flex-shrink-0 flex items-center justify-center bg-primary/10">
+                                        @if($product->expert_image_url)
+                                            <img src="{{ $product->expert_image_url }}" 
+                                                 alt="{{ $product->expert_name }}"
+                                                 class="w-full h-full object-cover">
+                                        @else
+                                            <span class="material-symbols-outlined text-primary">person</span>
+                                        @endif
                                     </div>
                                     <div>
                                         <p class="font-bold text-sm">{{ $product->expert_name }}</p>
@@ -281,7 +215,7 @@
                             <h2 class="text-3xl font-black text-primary font-headline">منتجات مشابهة</h2>
                             <p class="text-on-surface-variant mt-1">حلول متكاملة لمحاصيلك</p>
                         </div>
-                        <a href="#" class="text-primary font-bold flex items-center gap-1 hover:underline flex-row-reverse">
+                        <a href="{{ route('products.index') }}" class="text-primary font-bold flex items-center gap-1 hover:underline flex-row-reverse">
                             عرض الكل
                             <span class="material-symbols-outlined">arrow_left</span>
                         </a>
@@ -289,12 +223,16 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($relatedProducts as $related)
-                            <div class="bg-surface-container-lowest p-4 rounded-xl shadow-sm hover:shadow-md transition-all group">
+                            <a href="{{ route('products.show', $related) }}" class="bg-surface-container-lowest p-4 rounded-xl shadow-sm hover:shadow-md transition-all group">
                                 <!-- Image -->
-                                <div class="relative aspect-square overflow-hidden rounded-lg mb-4">
-                                    <img src="{{ $related->images->first()?->image_url ?? 'https://via.placeholder.com/300' }}" 
-                                         alt="{{ $related->name }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="relative aspect-square overflow-hidden rounded-lg mb-4 bg-surface-container-low flex items-center justify-center">
+                                    @if($related->images->first()?->asset_url)
+                                        <img src="{{ $related->images->first()->asset_url }}" 
+                                             alt="{{ $related->name }}"
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    @else
+                                        <span class="material-symbols-outlined text-outline-variant text-5xl">image</span>
+                                    @endif
                                     
                                     @if($loop->first)
                                         <span class="absolute top-2 right-2 bg-primary text-on-primary text-[10px] font-bold px-2 py-1 rounded-full">
@@ -306,85 +244,26 @@
                                 <!-- Info -->
                                 <p class="text-[10px] font-bold text-tertiary">{{ $related->supplier_label ?? 'الموردة' }}</p>
                                 <p class="font-bold text-on-surface mt-1 group-hover:text-primary transition-colors line-clamp-2">{{ $related->name }}</p>
-
-                                <!-- Cart Button -->
-                                <div class="mt-4 flex justify-between items-center">
-                                    <button class="bg-surface-container-high p-2 rounded-full hover:bg-primary-fixed transition-colors">
-                                        <span class="material-symbols-outlined text-sm text-on-surface">shopping_cart</span>
-                                    </button>
-                                </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </section>
             @endif
-        </main>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="mt-16 py-12 px-8 bg-[#f4f4ef] border-t border-[#e3e3de]/20">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto text-right font-body">
-            <!-- Column 1: Brand -->
-            <div>
-                <h3 class="font-bold text-primary font-headline text-lg mb-6">The Fertile Estate</h3>
-                <p class="text-[#42493e] leading-relaxed text-sm mb-4">
-                    منصتك الموثوقة للعثور على أفضل المنتجات الزراعية من أكبر الموردين في مصر
-                </p>
-                <div class="flex gap-3 flex-row-reverse">
-                    <button class="text-primary hover:text-primary-container transition-colors">
-                        <span class="material-symbols-outlined">social_leaderboard</span>
-                    </button>
-                    <button class="text-primary hover:text-primary-container transition-colors">
-                        <span class="material-symbols-outlined">language</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Column 2: Quick Links -->
-            <div>
-                <h3 class="uppercase tracking-wider text-primary font-bold text-sm mb-6">روابط سريعة</h3>
-                <ul class="space-y-4">
-                    <li><a href="#" class="text-[#42493e] hover:text-[#2D5A27] transition-colors text-sm">سياسة التوصيل</a></li>
-                    <li><a href="#" class="text-[#42493e] hover:text-[#2D5A27] transition-colors text-sm">طرق الدفع</a></li>
-                    <li><a href="#" class="text-[#42493e] hover:text-[#2D5A27] transition-colors text-sm">تواصل الدعم</a></li>
-                    <li><a href="#" class="text-[#42493e] hover:text-[#2D5A27] transition-colors text-sm">من نحن</a></li>
-                    <li><a href="#" class="text-primary font-semibold underline underline-offset-4 text-sm">شروط الخدمة</a></li>
-                </ul>
-            </div>
-
-            <!-- Column 3: Contact -->
-            <div>
-                <h3 class="uppercase tracking-wider text-primary font-bold text-sm mb-6">تواصل معنا</h3>
-                <p class="text-[#42493e] leading-relaxed text-sm mb-3">شارع النيل، القاهرة، مصر</p>
-                <p class="text-[#42493e] leading-relaxed text-sm mb-3">+20 2 1234 5678</p>
-                <p class="text-[#42493e] leading-relaxed text-sm mb-8">info@nileharvest.com</p>
-                <p class="text-xs text-[#42493e] opacity-70">© 2026 The Fertile Estate. جميع الحقوق محفوظة</p>
-            </div>
         </div>
-    </footer>
-
-    <!-- MOBILE BOTTOM NAV (Hidden on md+) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-md border-t border-outline-variant/10 px-6 py-4 z-50 flex justify-between items-center">
-        <div class="flex flex-col items-center gap-1 flex-1">
-            <span class="material-symbols-outlined text-lg text-on-surface">home</span>
-            <span class="text-[10px] text-on-surface">الرئيسية</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 flex-1">
-            <span class="material-symbols-outlined text-lg text-primary" style="font-variation-settings: 'FILL' 1">pest_control</span>
-            <span class="text-[10px] text-primary font-bold">المبيدات</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 flex-1">
-            <span class="material-symbols-outlined text-lg text-on-surface">shopping_cart</span>
-            <span class="text-[10px] text-on-surface">السلة</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 flex-1">
-            <span class="material-symbols-outlined text-lg text-on-surface">account_circle</span>
-            <span class="text-[10px] text-on-surface">حسابي</span>
-        </div>
-    </nav>
-</div>
 
 <script>
+    function increaseQty() {
+        const input = document.getElementById('quantity');
+        const minQty = parseInt(input.min) || 1;
+        input.value = Math.max(minQty, parseInt(input.value) + 1);
+    }
+
+    function decreaseQty() {
+        const input = document.getElementById('quantity');
+        const minQty = parseInt(input.min) || 1;
+        input.value = Math.max(minQty, parseInt(input.value) - 1);
+    }
+
     // Tab switching functionality
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -404,6 +283,4 @@
         });
     });
 </script>
-
 @endsection
-

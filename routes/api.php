@@ -6,8 +6,8 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductImageController;
 use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Api\V1\Customer\OrderStatusController;
 use App\Http\Controllers\Api\V1\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 
@@ -69,8 +69,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{order}/tracking', [AdminOrderController::class, 'getTracking']);
         });
 
-        // Admin conversations
-        Route::get('/admin/conversations', [ChatController::class, 'getConversations']);
+
     });
 
     // Customer order routes
@@ -80,14 +79,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [CustomerOrderController::class, 'index']);
             Route::post('/', [CustomerOrderController::class, 'store']);
             Route::get('/{order}', [CustomerOrderController::class, 'show']);
+            Route::get('/{order}/status', [OrderStatusController::class, 'getStatus']);
             Route::post('/{order}/quotes/{quote}/accept', [CustomerOrderController::class, 'acceptQuote']);
             Route::post('/{order}/quotes/{quote}/reject', [CustomerOrderController::class, 'rejectQuote']);
         });
 
-        // Chat routes
-        Route::prefix('orders/{order}/messages')->group(function () {
-            Route::get('/', [ChatController::class, 'getMessages']);
-            Route::post('/', [ChatController::class, 'sendMessage']);
-        });
+
     });
 });

@@ -125,6 +125,11 @@
 <body class="bg-surface text-on-surface min-h-screen flex flex-col">
     @yield('content')
     
+    <!-- Floating Chat Widget -->
+    @auth
+        @include('components.chat.floating-widget')
+    @endauth
+    
     @stack('scripts')
 </body>
 </html>

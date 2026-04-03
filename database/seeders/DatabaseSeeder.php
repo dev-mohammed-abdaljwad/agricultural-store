@@ -86,7 +86,10 @@ class DatabaseSeeder extends Seeder
 
         $createdCategories = [];
         foreach ($categories as $catData) {
-            $createdCategories[] = Category::create($catData);
+            $createdCategories[] = Category::updateOrCreate(
+                ['name' => $catData['name']],
+                $catData
+            );
         }
 
         // Create products

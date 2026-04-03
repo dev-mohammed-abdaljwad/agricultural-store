@@ -18,8 +18,9 @@
     
     <div class="flex items-center gap-2 sm:gap-4">
         @auth
-            <a href="#" class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-95">
+            <a href="{{ route('cart.index') }}" class="p-2 text-on-surface-variant hover:text-primary transition-transform active:scale-95 relative" title="السلة">
                 <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="absolute top-0 right-0 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold cart-count" id="cartCount">0</span>
             </a>
             <!-- User Profile Dropdown -->
             <div class="relative group">
@@ -113,7 +114,29 @@
 
 @auth
 <script>
+    // Load cart count on page load
+    function updateCartCount() {
+        fetch('{{ route("cart.count") }}')
+            .then(response => response.json())
+            .then(data => {
+                const cartCountEl = document.getElementById('cartCount');
+                if (cartCountEl) {
+                    cartCountEl.textContent = data.count || 0;
+                    // Hide badge if count is 0
+                    if (data.count === 0) {
+                        cartCountEl.classList.add('hidden');
+                    } else {
+                        cartCountEl.classList.remove('hidden');
+                    }
+                }
+            })
+            .catch(error => console.log('Cart count update failed'));
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Load cart count on page load
+        updateCartCount();
+        
         const userMenuBtn = document.getElementById('userMenuBtn');
         const userDropdownMobile = document.getElementById('userDropdownMobile');
         
@@ -139,5 +162,8 @@
             });
         }
     });
+
+    // Update cart count after adding/removing items
+    window.updateCartCount = updateCartCount;
 </script>
 @endauth

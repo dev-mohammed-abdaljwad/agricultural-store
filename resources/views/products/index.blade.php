@@ -1,17 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
 @section('title', 'السوق الزراعي - نيل هارفست')
 
 @section('content')
-<!-- Top Navigation -->
-<x-header />
-
-<div class="pt-20 flex min-h-screen">
-    <!-- Sidebar -->
-    <x-sidebar :categories="$categories" />
-    
-    <!-- Main Content -->
-    <main class="flex-1 p-8 lg:p-12 overflow-x-hidden lg:pr-64">
+<!-- Main Content -->
+<main class="flex-1 p-8 lg:p-12 overflow-x-hidden">
         <!-- Breadcrumbs -->
         <nav class="flex items-center gap-2 text-sm text-on-surface-variant mb-6 font-headline flex-row-reverse">
             <a class="hover:text-primary transition-colors" href="{{ route('home') }}">الرئيسية</a>
@@ -130,8 +123,4 @@
             </div>
         @endif
     </main>
-</div>
-
-<!-- Footer -->
-<x-footer />
 @endsection

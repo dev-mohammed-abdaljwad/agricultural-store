@@ -34,6 +34,13 @@
             <span class="font-['Be_Vietnam_Pro','Tajawal'] font-bold text-lg">الطلبات</span>
         </a>
 
+        <!-- Delivery Agents -->
+        <a class="flex items-center gap-3 {{ request()->routeIs('admin.delivery-agents.*') ? 'bg-[#bcf0ae] dark:bg-green-900/30 text-[#154212] dark:text-green-300 scale-[0.98]' : 'text-[#42493e] dark:text-stone-400 hover:bg-[#e3e3de] dark:hover:bg-stone-800 hover:text-[#1a1c19]' }} rounded-lg px-4 py-3 transition-all"
+            href="{{ route('admin.delivery-agents.index') }}">
+            <span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+            <span class="font-['Be_Vietnam_Pro','Tajawal'] font-bold text-lg">عمال التوصيل</span>
+        </a>
+
         <!-- Users -->
         <a class="flex items-center gap-3 {{ request()->routeIs('admin.users.*') ? 'bg-[#bcf0ae] dark:bg-green-900/30 text-[#154212] dark:text-green-300 scale-[0.98]' : 'text-[#42493e] dark:text-stone-400 hover:bg-[#e3e3de] dark:hover:bg-stone-800 hover:text-[#1a1c19]' }} rounded-lg px-4 py-3 transition-all"
             href="{{ route('admin.users.index') }}">

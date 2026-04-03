@@ -14,6 +14,24 @@ use Illuminate\Support\Facades\Auth;
 class QuoteController extends Controller
 {
     /**
+     * List all quotes for the authenticated customer
+     */
+    public function index()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $quotes = Order::where('customer_id', Auth::id())
+            ->whereHas('quotes')
+            ->with(['quotes', 'customer'])
+            ->latest()
+            ->paginate(15);
+
+        return view('quotes.index', compact('quotes'));
+    }
+
+    /**
      * Create a new quote request (place order for quote)
      */
     public function create(Request $request)

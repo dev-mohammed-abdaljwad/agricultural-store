@@ -56,12 +56,13 @@
             <span class="px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm md:text-base flex-shrink-0 whitespace-nowrap
                 @if($order->status === 'pending') bg-warning text-on-warning
                 @elseif($order->status === 'quote_pending') bg-info text-on-info
-                @elseif($order->status === 'confirmed') bg-success text-on-success
+                @elseif($order->status === 'quote_accepted') bg-success text-on-success
                 @elseif($order->status === 'shipped') bg-secondary text-on-secondary
                 @elseif($order->status === 'delivered') bg-primary text-on-primary
                 @elseif($order->status === 'rejected') bg-error text-on-error
                 @else bg-surface-container text-on-surface
-                @endif">
+                @endif"
+                data-order-status="{{ $order->status }}">
                 @switch($order->status)
                     @case('pending')
                         قيد المراجعة
@@ -69,7 +70,7 @@
                     @case('quote_pending')
                         في انتظار عرض السعر
                         @break
-                    @case('confirmed')
+                    @case('quote_accepted')
                         تم التأكيد
                         @break
                     @case('shipped')
@@ -186,14 +187,14 @@
                         <!-- Quote Actions -->
                         @if($order->quote->status === 'pending')
                             <div class="flex flex-col gap-3 mt-8">
-                                <form method="POST" action="{{ route('orders.quote.accept', [$order->id, $order->quote->id]) }}">
+                                <form method="POST" action="{{ route('customer.orders.acceptQuote', [$order->id, $order->quote->id]) }}">
                                     @csrf
                                     <button type="submit" class="w-full py-3 bg-success text-on-success font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
                                         <span class="material-symbols-outlined">check_circle</span>
                                         وافق على العرض
                                     </button>
                                 </form>
-                                <form method="POST" action="{{ route('orders.quote.reject', [$order->id, $order->quote->id]) }}">
+                                <form method="POST" action="{{ route('customer.orders.rejectQuote', [$order->id, $order->quote->id]) }}">
                                     @csrf
                                     <button type="submit" class="w-full py-3 bg-error text-on-error font-bold rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
                                         <span class="material-symbols-outlined">cancel</span>
@@ -259,7 +260,7 @@
                             $statuses = [
                                 'pending' => ['عرض السعر', 'pending'],
                                 'quote_pending' => ['في انتظار العرض', 'quote_pending'],
-                                'confirmed' => ['تم التأكيد', 'confirmed'],
+                                'quote_accepted' => ['تم التأكيد', 'quote_accepted'],
                                 'shipped' => ['قيد الشحن', 'shipped'],
                                 'delivered' => ['تم التسليم', 'delivered'],
                             ];
@@ -306,12 +307,10 @@
                             <span class="text-on-surface-variant">تاريخ الطلب:</span>
                             <span class="font-bold text-on-surface">{{ $order->created_at->format('d M Y') }}</span>
                         </div>
-                        @if($order->tracking)
-                            <div class="flex items-center justify-between py-3">
-                                <span class="text-on-surface-variant">رقم التتبع:</span>
-                                <span class="font-mono font-bold text-primary">{{ $order->tracking->tracking_number }}</span>
-                            </div>
-                        @endif
+                        <div class="flex items-center justify-between py-3">
+                            <span class="text-on-surface-variant">رقم التتبع:</span>
+                            <span class="font-mono font-bold text-primary">{{ $order->order_number }}</span>
+                        </div>
                     </div>
 
                     @if($order->notes)
@@ -383,4 +382,52 @@
 
 <!-- Footer -->
 <x-footer />
+
+<script>
+// Auto-refresh order status every 10 seconds
+(function() {
+    const orderId = {{ $order->id }};
+    const API_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    
+    async function refreshOrderStatus() {
+        try {
+            // Get current status from API
+            const response = await fetch(`/api/v1/orders/${orderId}/status`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${API_TOKEN}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            if (!response.ok) return;
+            
+            const data = await response.json();
+            
+            // Update status badge if changed
+            const statusBadges = document.querySelectorAll('[data-order-status]');
+            statusBadges.forEach(badge => {
+                const oldStatus = badge.getAttribute('data-order-status');
+                
+                if (oldStatus !== data.status) {
+                    // Status changed - reload page to reflect all changes
+                    location.reload();
+                }
+            });
+        } catch (error) {
+            console.log('Status check failed (may be offline)');
+        }
+    }
+    
+    // Check status every 10 seconds
+    setInterval(refreshOrderStatus, 10000);
+    
+    // Also check on page visibility change (when user returns to tab)
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            refreshOrderStatus();
+        }
+    });
+})();
+</script>
 @endsection
