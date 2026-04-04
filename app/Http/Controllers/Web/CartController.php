@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Services\ToastService;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -29,7 +30,6 @@ class CartController extends Controller
                     'supplier' => $item->product->supplier_name,
                     'image' => $item->product->images->first()?->asset_url,
                     'quantity' => $item->quantity,
-                    'unit' => $item->product->unit,
                     'unit_price' => $item->product->base_price,
                     'total_price' => $item->quantity * $item->product->base_price,
                 ];
@@ -76,17 +76,17 @@ class CartController extends Controller
             $cartItem->update([
                 'quantity' => $cartItem->quantity + $validated['quantity'],
             ]);
-            $message = $product->name . ' تم تحديث الكمية';
+            ToastService::updated('السلة');
         } else {
             // Create new cart item
             $user->cartItems()->create([
                 'product_id' => $product->id,
                 'quantity' => $validated['quantity'],
             ]);
-            $message = $product->name . ' تمت إضافته للسلة';
+            ToastService::created('المنتج');
         }
 
-        return redirect()->route('cart.index')->with('success', $message);
+        return redirect()->route('cart.index');
     }
 
     /**
@@ -112,7 +112,8 @@ class CartController extends Controller
             ]);
         }
 
-        return back()->with('success', 'تم تحديث الكمية');
+        ToastService::updated('الكمية');
+        return back();
     }
 
     /**
@@ -124,10 +125,10 @@ class CartController extends Controller
             abort(403);
         }
 
-        $productName = $cartItem->product->name;
         $cartItem->delete();
 
-        return redirect()->route('cart.index')->with('success', $productName . ' تم حذفه من السلة');
+        ToastService::deleted('المنتج');
+        return redirect()->route('cart.index');
     }
 
     /**
@@ -137,7 +138,8 @@ class CartController extends Controller
     {
         auth()->user()->cartItems()->delete();
 
-        return back()->with('success', 'تم تفريغ السلة');
+        ToastService::deleted('السلة');
+        return back();
     }
 
     /**

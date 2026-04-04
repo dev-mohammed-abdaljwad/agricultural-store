@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'الطلبات - نيل هارفست')
+@section('title', 'الطلبات - حصاد')
 
 @section('content')
 <main class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6 pb-20">
@@ -133,4 +133,40 @@
         </div>
     @endif
 </main>
+
+<script>
+// Listen for real-time order status updates via Pusher
+@auth
+    if (window.pusher) {
+        // Subscribe to admin notifications channel
+        const adminNotifications = window.pusher.subscribe('private-admin.notifications');
+        
+        // Listen for order status updates
+        adminNotifications.bind('order-status-updated', function(data) {
+            console.log('✓ Order #' + data.order_number + ' status updated:', data.message);
+            
+            // Show toast notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-24 right-4 bg-success text-on-success px-6 py-3 rounded-lg shadow-lg z-50';
+            notification.innerHTML = '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">check_circle</span><span>الطلب #' + data.order_number + ': ' + data.message + '</span></div>';
+            document.body.appendChild(notification);
+            
+            // Auto-remove notification after 5 seconds
+            setTimeout(() => notification.remove(), 5000);
+            
+            // Optionally reload orders table after 2 seconds
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        });
+        
+        // Handle subscription errors
+        adminNotifications.bind('pusher:subscription_error', function(status) {
+            console.warn('Failed to subscribe to admin notifications:', status);
+        });
+    } else {
+        console.warn('Pusher not initialized - real-time notifications unavailable');
+    }
+@endauth
+</script>
 @endsection

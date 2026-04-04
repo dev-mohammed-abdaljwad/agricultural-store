@@ -3,7 +3,7 @@
     
     <!-- Brand -->
     <div class="px-5 py-6 border-b border-white/10">
-        <p class="font-black italic text-2xl font-headline">{{ $brandName ?? 'Nile Harvest' }}</p>
+        <p class="font-black italic text-2xl font-headline">{{ $brandName ?? 'حصاد' }}</p>
         <p class="text-xs text-white/50 mt-1">{{ $subtitle ?? 'Agronomist Portal' }}</p>
     </div>
 

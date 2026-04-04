@@ -10,6 +10,7 @@ use App\Models\PricingQuote;
 use App\Models\Message;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Services\ToastService;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -48,7 +49,6 @@ class OrderController extends Controller
                     'supplier' => $item->product->supplier_name,
                     'image' => $item->product->images->first()?->url,
                     'quantity' => $item->quantity,
-                    'unit' => $item->product->unit,
                 ];
             })
             ->toArray();
@@ -80,7 +80,6 @@ class OrderController extends Controller
                     'name' => $item->product->name,
                     'image' => $item->product->images->first()?->asset_url,
                     'quantity' => $item->quantity,
-                    'unit' => $item->product->unit,
                 ];
             })
             ->toArray();
@@ -143,8 +142,8 @@ class OrderController extends Controller
         // Clear cart
         $user->cartItems()->delete();
 
-        return redirect()->route('cart.index')
-            ->with('success', 'تم إرسال الطلب بنجاح. رقم الطلب: ' . $order->order_number);
+        ToastService::created('الطلب');
+        return redirect()->route('orders.placed-success', ['order' => $order]);
     }
 
     /**
@@ -199,7 +198,7 @@ class OrderController extends Controller
                 'name' => $item->orderItem->product->name,
                 'supplier' => $item->orderItem->product->supplier_name,
                 'image' => $item->orderItem->product->images->first()?->url,
-                'quantity' => $item->orderItem->quantity . ' ' . $item->orderItem->product->unit,
+                'quantity' => $item->orderItem->quantity,
                 'unit_price' => $item->unit_price,
                 'total_price' => $item->total_price,
             ];
@@ -276,7 +275,6 @@ class OrderController extends Controller
                 return [
                     'name' => $quoteItem->orderItem->product->name,
                     'quantity' => $quoteItem->orderItem->quantity,
-                    'unit' => $quoteItem->orderItem->product->unit,
                     'supplier' => $quoteItem->orderItem->product->supplier_name ?? 'المورد',
                     'image' => $quoteItem->orderItem->product->images->first()?->asset_url,
                     'unit_price' => $quoteItem->unit_price,
@@ -312,7 +310,7 @@ class OrderController extends Controller
             return [
                 'name' => $item->orderItem->product->name,
                 'image' => $item->orderItem->product->images->first()?->url,
-                'quantity' => $item->orderItem->quantity . ' ' . $item->orderItem->product->unit,
+                'quantity' => $item->orderItem->quantity,
                 'old_price' => $item->unit_price,
                 'badge' => 'جودة ممتازة',
                 'currency' => 'ج.م',
@@ -381,8 +379,8 @@ class OrderController extends Controller
         // Update order status to quote_accepted
         $order->update(['status' => 'quote_accepted']);
 
-        return redirect()->route('customer.orders.confirmed', ['order' => $order])
-            ->with('success', 'تم قبول العرض بنجاح');
+        ToastService::updated('العرض');
+        return redirect()->route('customer.orders.confirmed', ['order' => $order]);
     }
 
     /**
@@ -416,8 +414,8 @@ class OrderController extends Controller
             'rejected_at' => now(),
         ]);
 
-        return redirect()->route('customer.orders.quote-rejected', ['order' => $order])
-            ->with('success', 'تم رفض العرض بنجاح. سيتم إرسال عرض جديد قريباً');
+        ToastService::deleted('العرض');
+        return redirect()->route('customer.orders.quote-rejected', ['order' => $order]);
     }
 
     /**
@@ -450,6 +448,59 @@ class OrderController extends Controller
         ]);
 
         return back()->with('success', 'تم إرسال الرسالة');
+    }
+
+    /**
+     * Get order status (for AJAX status checks)
+     */
+    public function statusCheck(Order $order)
+    {
+        // Verify user owns this order
+        if ($order->customer_id !== auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $order->refresh();
+
+        // Check if there's a pending notification for this order
+        $notification_message = null;
+        $show_notification = false;
+        
+        // If status changed, prepare notification message
+        if (session('order_' . $order->id . '_last_status') !== $order->status) {
+            $show_notification = true;
+            
+            // Get the status label for notification
+            $statusLabel = $order->getStatusLabel();
+            
+            // Build notification message based on status
+            $notification_messages = [
+                'placed' => 'تم استقبال طلبك بنجاح',
+                'quote_pending' => 'جاري تحضير عرض السعر',
+                'quote_sent' => 'تم إرسال عرض السعر لطلبك',
+                'quote_accepted' => 'تم تأكيد قبول العرض',
+                'quote_rejected' => 'تم رفض العرض',
+                'paid' => 'تم تأكيد الدفع',
+                'preparing' => 'جاري تحضير الشحنة',
+                'out_for_delivery' => 'الطلب في الطريق إليك',
+                'delivered' => 'تم استلام الطلب بنجاح',
+                'cancelled' => 'تم إلغاء الطلب',
+                'returned' => 'تم إرجاع الطلب',
+            ];
+            
+            $notification_message = $notification_messages[$order->status] ?? 'تم تحديث حالة الطلب: ' . $statusLabel;
+            
+            // Store the last status in session to avoid duplicate notifications
+            session(['order_' . $order->id . '_last_status' => $order->status]);
+        }
+
+        return response()->json([
+            'status' => $order->status,
+            'status_label' => $order->getStatusLabel(),
+            'updated_at' => $order->updated_at,
+            'notification_message' => $notification_message,
+            'show_notification' => $show_notification,
+        ]);
     }
 }
 

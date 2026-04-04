@@ -19,8 +19,15 @@ class AdminProductController extends Controller
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
-            'unit' => 'nullable|string|max:50',
-            'min_order_qty' => 'nullable|integer|min:1',
+            'chemical_composition' => 'nullable|string',
+            'package_sizes' => 'nullable|string',
+            'how_it_works' => 'nullable|string',
+            'extended_description' => 'nullable|string',
+            'frac_group' => 'nullable|string|max:100',
+            'benefits' => 'nullable|string',
+            'usage_recommendations' => 'nullable|string',
+            'safety_notice' => 'nullable|string',
+            'registration_number' => 'nullable|string|max:100',
             'is_certified' => 'nullable|boolean',
             'supplier_name' => 'nullable|string|max:255',
             'supplier_code' => 'nullable|string|max:100',
@@ -32,6 +39,8 @@ class AdminProductController extends Controller
             'expert_name' => 'nullable|string|max:255',
             'expert_title' => 'nullable|string|max:255',
             'expert_image_url' => 'nullable|url',
+            'crops' => 'nullable|array',
+            'crops.*' => 'exists:crops,id',
             'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
@@ -41,8 +50,15 @@ class AdminProductController extends Controller
             'name' => $validated['name'],
             'category_id' => $validated['category_id'],
             'description' => $validated['description'] ?? '',
-            'unit' => $validated['unit'] ?? null,
-            'min_order_qty' => $validated['min_order_qty'] ?? 1,
+            'chemical_composition' => $validated['chemical_composition'] ?? null,
+            'package_sizes' => $validated['package_sizes'] ?? null,
+            'how_it_works' => $validated['how_it_works'] ?? null,
+            'extended_description' => $validated['extended_description'] ?? null,
+            'frac_group' => $validated['frac_group'] ?? null,
+            'benefits' => $validated['benefits'] ?? null,
+            'usage_recommendations' => $validated['usage_recommendations'] ?? null,
+            'safety_notice' => $validated['safety_notice'] ?? null,
+            'registration_number' => $validated['registration_number'] ?? null,
             'is_certified' => $validated['is_certified'] ?? false,
             'supplier_name' => $validated['supplier_name'] ?? null,
             'supplier_code' => $validated['supplier_code'] ?? null,
@@ -56,6 +72,11 @@ class AdminProductController extends Controller
             'expert_image_url' => $validated['expert_image_url'] ?? null,
             'status' => $validated['status'] ?? 'active',
         ]);
+
+        // Attach crops if provided
+        if (!empty($validated['crops'])) {
+            $product->crops()->attach($validated['crops']);
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -93,8 +114,15 @@ class AdminProductController extends Controller
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
-            'unit' => 'nullable|string|max:50',
-            'min_order_qty' => 'nullable|integer|min:1',
+            'chemical_composition' => 'nullable|string',
+            'package_sizes' => 'nullable|string',
+            'how_it_works' => 'nullable|string',
+            'extended_description' => 'nullable|string',
+            'frac_group' => 'nullable|string|max:100',
+            'benefits' => 'nullable|string',
+            'usage_recommendations' => 'nullable|string',
+            'safety_notice' => 'nullable|string',
+            'registration_number' => 'nullable|string|max:100',
             'is_certified' => 'nullable|boolean',
             'supplier_name' => 'nullable|string|max:255',
             'supplier_code' => 'nullable|string|max:100',
@@ -106,6 +134,8 @@ class AdminProductController extends Controller
             'expert_name' => 'nullable|string|max:255',
             'expert_title' => 'nullable|string|max:255',
             'expert_image_url' => 'nullable|url',
+            'crops' => 'nullable|array',
+            'crops.*' => 'exists:crops,id',
             'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
@@ -114,8 +144,15 @@ class AdminProductController extends Controller
             'name' => $validated['name'],
             'category_id' => $validated['category_id'],
             'description' => $validated['description'] ?? '',
-            'unit' => $validated['unit'] ?? null,
-            'min_order_qty' => $validated['min_order_qty'] ?? 1,
+            'chemical_composition' => $validated['chemical_composition'] ?? null,
+            'package_sizes' => $validated['package_sizes'] ?? null,
+            'how_it_works' => $validated['how_it_works'] ?? null,
+            'extended_description' => $validated['extended_description'] ?? null,
+            'frac_group' => $validated['frac_group'] ?? null,
+            'benefits' => $validated['benefits'] ?? null,
+            'usage_recommendations' => $validated['usage_recommendations'] ?? null,
+            'safety_notice' => $validated['safety_notice'] ?? null,
+            'registration_number' => $validated['registration_number'] ?? null,
             'is_certified' => $validated['is_certified'] ?? false,
             'supplier_name' => $validated['supplier_name'] ?? null,
             'supplier_code' => $validated['supplier_code'] ?? null,
@@ -129,6 +166,11 @@ class AdminProductController extends Controller
             'expert_image_url' => $validated['expert_image_url'] ?? null,
             'status' => $validated['status'] ?? 'active',
         ]);
+
+        // Sync crops if provided
+        if (array_key_exists('crops', $validated)) {
+            $product->crops()->sync($validated['crops'] ?? []);
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -158,7 +200,7 @@ class AdminProductController extends Controller
     }
 
     /**
-     * Remove the specified product from storage.
+     * Remove the specified product from storage AND RETRUN TO PRODUCT INDEX PAGE 
      */
     public function destroy(Request $request, Product $product)
     {
@@ -177,7 +219,7 @@ class AdminProductController extends Controller
 
         // Fallback to redirect for non-AJAX requests
         return redirect()
-            ->route('admin.dashboard')
+            ->route('products.index')
             ->with('success', 'تم حذف المنتج بنجاح');
     }
 }

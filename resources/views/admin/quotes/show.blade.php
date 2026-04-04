@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'عرض السعر #' . $quote->id . ' - نيل هارفست')
+@section('title', 'عرض السعر #' . $quote->id . ' - حصاد')
 
 @section('content')
 <div class="min-h-screen bg-surface p-6 md:p-12">

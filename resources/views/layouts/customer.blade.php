@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    <title>@yield('title', 'نيل هارفست')</title>
+    <title>@yield('title', 'حصاد')</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;700;900&family=Tajawal:wght@400;500;700;900&family=Manrope:wght@400;500;700&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet"/>
@@ -92,9 +92,11 @@
     @stack('styles')
 </head>
 <body class="bg-surface font-body text-on-surface">
+    <x-toast-container />
+    
     <!-- Top Navigation Bar -->
     <nav class="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-md flex flex-row-reverse justify-between items-center px-8 h-20">
-        <div class="text-2xl font-black text-primary font-headline">نيل هارفست</div>
+        <div class="text-2xl font-black text-primary font-headline">حصاد</div>
 
         {{-- Desktop Navigation --}}
         <div class="hidden md:flex flex-row-reverse gap-8 items-center">
@@ -109,7 +111,7 @@
             <button class="p-2 transition-all hover:text-primary text-on-surface-variant">
                 <span class="material-symbols-outlined">notifications</span>
             </button>
-            <a href="{{ route('orders.index') }}" class="p-2 transition-all hover:text-primary text-on-surface-variant" title="الرسائل">
+            <a href="{{ route('chat.index') }}" class="p-2 transition-all hover:text-primary text-on-surface-variant" title="الرسائل">
                 <span class="material-symbols-outlined">mail</span>
             </a>
             <a href="{{ route('cart.index') }}" class="p-2 transition-all hover:text-primary text-on-surface-variant" title="السلة">
@@ -117,8 +119,8 @@
             </a>
 
             {{-- User Profile Dropdown --}}
-            <div class="relative group">
-                <button class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border-2 border-primary-fixed flex items-center justify-center">
+            <div class="relative">
+                <button id="profileBtn" class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border-2 border-primary-fixed flex items-center justify-center hover:ring-2 hover:ring-primary-fixed transition-all">
                     @if(auth()->check() && auth()->user()->avatar)
                     <img alt="صورة الملف الشخصي" src="{{ auth()->user()->avatar }}" class="w-full h-full object-cover"/>
                     @else
@@ -127,7 +129,7 @@
                 </button>
 
                 {{-- Dropdown Menu --}}
-                <div class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 hidden group-hover:block z-50">
+                <div id="profileDropdown" class="absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 hidden z-50">
                     <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-on-surface hover:bg-surface-container-low transition-colors text-sm">الملف الشخصي</a>
                     <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-on-surface hover:bg-surface-container-low transition-colors text-sm">طلباتي</a>
                     <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-on-surface hover:bg-surface-container-low transition-colors text-sm">الإعدادات</a>
@@ -142,16 +144,16 @@
     </nav>
 
     {{-- Side Navigation (Desktop) --}}
-    <aside class="hidden lg:flex h-screen w-64 fixed right-0 top-20 flex-col py-6 bg-surface-container-low border-l border-outline-variant/20">
-        <div class="px-6 mb-8">
+    <aside class="hidden lg:flex h-screen w-64 fixed right-0 top-20 flex-col py-6 bg-surface-container-low border-l border-outline-variant/20 overflow-hidden">
+        <div class="px-6 mb-8 flex-shrink-0">
             <div class="flex items-center gap-3 mb-2">
                 <span class="material-symbols-outlined text-primary text-3xl">psychology</span>
-                <span class="font-headline font-bold text-xl text-primary">نيل هارفست</span>
+                <span class="font-headline font-bold text-xl text-primary">حصاد</span>
             </div>
             <p class="text-xs text-on-surface-variant">المنصة الرقمية للزراعة</p>
         </div>
 
-        <nav class="flex flex-col gap-1">
+        <nav class="flex flex-col gap-1 overflow-y-auto flex-1">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
                 <span class="material-symbols-outlined">dashboard</span>
                 <span>لوحة التحكم</span>
@@ -162,24 +164,24 @@
             </a>
             <a href="{{ route('orders.index') ?? '#' }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
                 <span class="material-symbols-outlined">receipt_long</span>
-                <span>سجل الطلبات</span>
+                <span> الطلبات</span>
             </a>
             <a href="{{ route('products.index') }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
                 <span class="material-symbols-outlined">psychology</span>
-                <span>المحاصيل</span>
+                <span>المنتجات</span>
             </a>
             <a href="{{ route('chat.index') }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
                 <span class="material-symbols-outlined">chat_bubble</span>
-                <span>المحادثات</span>
+                <span>الرسائل</span>
             </a>
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
+            <a href="{{ route('settings') }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
                 <span class="material-symbols-outlined">settings</span>
-                <span>الإعدادات</span>
+                <span>  الإعدادات</span>
             </a>
         </nav>
 
-        <div class="mt-auto border-t border-outline-variant/20 pt-4">
-            <a href="#" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
+        <div class="flex-shrink-0 mt-4 border-t border-outline-variant/20 pt-4">
+            <a href="{{ route('chat.index') }}" class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg mx-2">
                 <span class="material-symbols-outlined">support_agent</span>
                 <span>الدعم الفني</span>
             </a>
@@ -222,6 +224,10 @@
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_offer</span>
             <span class="text-[8px] font-bold">عروضي</span>
         </a>
+        <a href="{{ route('chat.index') }}" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="text-[10px] font-bold">الدعم</span>
+        </a>
         <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
             <span class="material-symbols-outlined">person</span>
             <span class="text-[10px] font-bold">حسابي</span>
@@ -229,5 +235,33 @@
     </footer>
 
     @stack('scripts')
+
+    <script>
+        // Profile Dropdown Toggle
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if (profileBtn && profileDropdown) {
+            // Toggle dropdown on button click
+            profileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#profileBtn') && !e.target.closest('#profileDropdown')) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+
+            // Close dropdown when clicking a link
+            profileDropdown.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    profileDropdown.classList.add('hidden');
+                });
+            });
+        }
+    </script>
 </body>
 </html>

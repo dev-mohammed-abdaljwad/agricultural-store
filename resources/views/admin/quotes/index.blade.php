@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'إدارة عروض الأسعار - نيل هارفست')
+@section('title', 'إدارة عروض الأسعار - حصاد')
 
 @section('content')
 <main class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6 pb-20">

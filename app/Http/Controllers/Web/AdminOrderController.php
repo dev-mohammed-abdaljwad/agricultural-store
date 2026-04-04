@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Message;
 use App\Models\OrderTracking;
+use App\Events\OrderStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -115,6 +116,9 @@ class AdminOrderController extends Controller
             'description' => "تم تحديث الحالة من {$this->getStatusTitle($oldStatus)} إلى {$this->getStatusTitle($validated['status'])}",
             'occurred_at' => now()
         ]);
+        
+        // Broadcast status change via Pusher
+        OrderStatusUpdated::dispatch($order, $oldStatus, $validated['status']);
         
         return back()->with('success', 'تم تحديث حالة الطلب بنجاح');
     }

@@ -49,20 +49,6 @@
                             </select>
                         </div>
 
-                        <!-- Unit -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-xs sm:text-sm font-bold text-on-surface">وحدة القياس</label>
-                            <input id="unit" name="unit" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all" placeholder="لتر / كيلو / عبوة" type="text"/>
-                            <p class="text-xs text-on-surface-variant mt-1">مثال: لتر، كيلو، عبوة</p>
-                        </div>
-
-                        <!-- Min Order Qty -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-xs sm:text-sm font-bold text-on-surface">الحد الأدنى للطلب</label>
-                            <input id="min_order_qty" name="min_order_qty" value="1" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all" type="number" min="1"/>
-                            <p class="text-xs text-on-surface-variant mt-1">الكمية الدنيا المقبولة في الطلب</p>
-                        </div>
-
                         <!-- Status -->
                         <div class="flex flex-col gap-2 md:col-span-2">
                             <label class="text-xs sm:text-sm font-bold text-on-surface">حالة المنتج</label>
@@ -277,8 +263,6 @@
         // Populate all form fields with product data
         document.getElementById('name').value = productData.name || '';
         document.getElementById('category_id').value = productData.category_id || '';
-        document.getElementById('unit').value = productData.unit || '';
-        document.getElementById('min_order_qty').value = productData.min_order_qty || '';
         
         // Handle status radio buttons
         if (productData.status === 'active') {
@@ -330,17 +314,20 @@
         console.log('deleteProduct called with ID:', productId);
         
         if (!productId) {
-            alert('خطأ: لم يتم العثور على معرف المنتج.');
+            showError('لم يتم العثور على معرف المنتج', 'خطأ');
             return;
         }
         
-        if (confirm('هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
+        showDeleteConfirm(
+            'حذف المنتج',
+            'هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.',
+            () => {
             const csrfToken = document.querySelector('meta[name="csrf-token"]');
             const token = csrfToken ? csrfToken.content : '';
             
             if (!token) {
                 console.error('CSRF token not found');
-                alert('خطأ: لم يتم العثور على رمز الأمان. حاول تحديث الصفحة.');
+                showError('لم يتم العثور على رمز الأمان. حاول تحديث الصفحة', 'خطأ');
                 return;
             }
             
@@ -361,13 +348,15 @@
                     location.reload();
                 } else {
                     response.text().then(text => console.log('Error response:', text));
-                    alert('خطأ في حذف المنتج. حاول مرة أخرى.');
+                    showError('خطأ في حذف المنتج. حاول مرة أخرى');
                 }
             }).catch(error => {
                 console.error('Error:', error);
-                alert('خطأ في الاتصال. حاول مرة أخرى.');
+                showError('خطأ في الاتصال. حاول مرة أخرى');
             });
-        }
+        },
+        'حذف'
+        );
     }
 
     // Image preview functionality
@@ -476,7 +465,7 @@
 
             if (response.ok) {
                 const data = await response.json();
-                alert('تم ' + (data.message || 'حفظ المنتج بنجاح'));
+                showSuccess(data.message || 'حفظ المنتج بنجاح', 'نجح');
                 
                 closeProductModal();
                 
@@ -498,11 +487,11 @@
                 
             } else {
                 const error = await response.json();
-                alert('خطأ: ' + (error.message || 'فشل حفظ المنتج'));
+                showError(error.message || 'فشل حفظ المنتج', 'خطأ');
                 console.error('Error:', error);
             }
         } catch (error) {
-            alert('حدث خطأ: ' + error.message);
+            showError(error.message, 'خطأ');
             console.error('Error:', error);
         } finally {
             if (submitBtn) {

@@ -1,37 +1,28 @@
-@extends('layouts.app')
+@extends('layouts.chat')
 
-@section('content')
-<div class="min-h-screen bg-gradient-to-b from-primary/5 to-white" dir="rtl">
-    <!-- Header with Back Button -->
-    <div class="sticky top-0 z-40 bg-white border-b border-surface-200 shadow-sm">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('chat.index') }}" class="p-2 hover:bg-surface-100 rounded-full transition">
-                        <i class="material-symbols-outlined text-2xl text-surface-600">arrow_back</i>
-                    </a>
-                    <div>
-                        <p class="font-semibold text-surface-900">
-                            {{ $otherUser->name }}
-                        </p>
-                        <p class="text-xs text-surface-500">
-                            {{ $otherUser->isAdmin() ? __('messages.admin_support') : __('messages.customer') }}
-                        </p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-50 rounded-full">
-                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                        <span class="text-xs font-medium text-green-700">{{ __('messages.online') }}</span>
-                    </span>
+@section('chat-content')
+<div class="h-full overflow-hidden flex flex-col" dir="rtl">
+    <div class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 overflow-hidden flex flex-col">
+        <!-- Title Header -->
+        <div class="mb-4">
+            <div class="flex items-center gap-4">
+                <div>
+                    <p class="font-semibold text-surface-900">
+                        {{ $otherUser->name }}
+                    </p>
+                    <p class="text-xs text-surface-500">
+                        {{ $otherUser->isAdmin() ? __('messages.admin_support') : __('messages.customer') }}
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col h-[calc(100vh-200px)]">
-        <!-- Messages Container -->
-        <div class="flex-1 overflow-y-auto space-y-6 pb-6" id="messagesContainer">
+        <!-- Messages container and input area -->
+        <div class="flex-1 overflow-hidden flex flex-col">
+            <!-- Messages Box -->
+            <div class="bg-white rounded-2xl border border-surface-200 shadow-md overflow-hidden flex flex-col flex-1">
+                <!-- Messages Area -->
+                <div class="flex-1 overflow-y-auto space-y-6 pb-6 p-6" id="messagesContainer">
             @forelse($conversation->messages as $message)
                 <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-start' : 'justify-end' }} group">
                     @if($message->sender_id === auth()->id())
@@ -104,10 +95,11 @@
                     <p class="text-surface-500">{{ __('messages.start_conversation') }}</p>
                 </div>
             @endforelse
-        </div>
+                </div>
+            </div>
 
-        <!-- Message Input Form -->
-        <div class="border-t border-surface-200 bg-white rounded-t-2xl p-4">
+            <!-- Message Input Form -->
+            <div class="border-t border-surface-200 bg-white p-4">
             <form id="messageForm" class="flex items-end gap-3">
                 @csrf
 
@@ -149,6 +141,8 @@
                     <span class="inline-block w-2 h-2 bg-primary rounded-full animate-pulse"></span>
                     {{ __('messages.sending') }}
                 </p>
+            </div>
+                </div>
             </div>
         </div>
     </div>
@@ -199,8 +193,11 @@
         loadingIndicator.classList.remove('hidden');
 
         const formData = new FormData();
-        formData.append('body', body);
         formData.append('_token', token);
+
+        if (body) {
+            formData.append('body', body);
+        }
 
         if (fileInput.files.length > 0) {
             formData.append('attachment', fileInput.files[0]);
@@ -232,7 +229,7 @@
 
         } catch (error) {
             console.error('Error:', error);
-            alert('{{ __('messages.error_sending') }}');
+            showError('{{ __('messages.error_sending') }}');
         } finally {
             sendBtn.disabled = false;
             loadingIndicator.classList.add('hidden');
@@ -271,13 +268,26 @@
     }
 
     @if(config('broadcasting.default') === 'pusher')
-        Echo.private('conversation.{{ $conversation->id }}')
-            .listen('.message.sent', (event) => {
+        // Subscribe to conversation channel via Pusher WebSocket (not Echo)
+        if (typeof window.pusher !== 'undefined') {
+            const channel = window.pusher.subscribe('private-conversation.{{ $conversation->id }}');
+            
+            channel.bind('message.sent', (event) => {
+                // Don't add our own messages (already added from response)
                 if (event.sender.id !== {{ auth()->id() }}) {
                     addMessageToDOM(event.message);
                     scrollToBottom();
                 }
             });
+            
+            channel.bind('pusher:subscription_error', (error) => {
+                console.error('[FullPageChat] Subscription error:', error);
+            });
+            
+            console.log('[FullPageChat] ✅ Subscribed to conversation via Pusher');
+        } else {
+            console.warn('[FullPageChat] Pusher not initialized');
+        }
     @endif
 </script>
 @endpush

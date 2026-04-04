@@ -1,5 +1,5 @@
 {{-- resources/views/quotes/index.blade.php --}}
-@extends('layouts.app')
+@extends('layouts.customer')
 
 @section('title', 'عروض الأسعار')
 

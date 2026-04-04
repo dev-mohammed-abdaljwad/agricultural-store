@@ -1,13 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
-@section('title', 'طلب #' . $order->order_number . ' - نيل هارفست')
+@section('title', 'طلب #' . $order->order_number . ' - حصاد')
 
 @section('content')
 <!-- Top Navigation -->
 <nav class="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-md flex flex-row-reverse justify-between items-center px-4 sm:px-6 md:px-8 h-16 shadow-sm">
     <div class="flex items-center gap-4 sm:gap-6 md:gap-8">
         <a href="{{ route('home') }}" class="text-xl sm:text-2xl font-black text-primary tracking-tight font-headline">
-            Nile Harvest
+            حصاد
         </a>
         <div class="hidden lg:flex flex-row-reverse items-center gap-4 md:gap-6">
             <a class="text-on-surface-variant hover:text-primary font-headline font-bold text-sm md:text-lg transition-colors duration-200" href="{{ route('home') }}">الرئيسية</a>
@@ -118,11 +118,11 @@
                                     </p>
                                     <div class="flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm">
                                         <span class="font-medium text-on-surface">
-                                            الكمية: <span class="font-bold text-primary">{{ $item->quantity }}</span> {{ $item->product->unit }}
+                                            الكمية: <span class="font-bold text-primary">{{ $item->quantity }}</span>
                                         </span>
                                         @if($item->unit_price)
                                             <span class="text-on-surface-variant">
-                                                السعر: <span class="font-bold text-primary">{{ number_format($item->unit_price) }}</span> ج.م/{{ $item->product->unit }}
+                                                السعر: <span class="font-bold text-primary">{{ number_format($item->unit_price) }}</span> ج.م
                                             </span>
                                         @else
                                             <span class="text-on-surface-variant">السعر: قيد التحديد</span>
@@ -387,35 +387,52 @@
 // Auto-refresh order status every 10 seconds
 (function() {
     const orderId = {{ $order->id }};
-    const API_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    let lastStatus = '{{ $order->status }}';
     
     async function refreshOrderStatus() {
         try {
-            // Get current status from API
-            const response = await fetch(`/api/v1/orders/${orderId}/status`, {
+            // Get current status from web endpoint
+            const response = await fetch(`/orders/${orderId}/status-check`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${API_TOKEN}`,
                     'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
             });
             
-            if (!response.ok) return;
+            if (!response.ok) {
+                console.warn('Status check error:', response.status);
+                return;
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                console.warn('Status check returned non-JSON response');
+                return;
+            }
             
             const data = await response.json();
             
             // Update status badge if changed
-            const statusBadges = document.querySelectorAll('[data-order-status]');
-            statusBadges.forEach(badge => {
-                const oldStatus = badge.getAttribute('data-order-status');
+            if (data.status && data.status !== lastStatus) {
+                lastStatus = data.status;
                 
-                if (oldStatus !== data.status) {
-                    // Status changed - reload page to reflect all changes
-                    location.reload();
+                // Show notification if message is available
+                if (data.notification_message) {
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-24 right-4 bg-success text-on-success px-6 py-3 rounded-lg shadow-lg z-50';
+                    notification.innerHTML = '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">check_circle</span><span>' + data.notification_message + '</span></div>';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => notification.remove(), 4000);
+                    console.log('✓ تحديث: ' + data.notification_message);
                 }
-            });
+                
+                // Reload page to reflect all changes
+                setTimeout(() => location.reload(), 1500);
+            }
         } catch (error) {
-            console.log('Status check failed (may be offline)');
+            console.log('Status check failed:', error.message);
         }
     }
     
@@ -428,6 +445,37 @@
             refreshOrderStatus();
         }
     });
+    
+    // Listen for real-time order status updates via Pusher
+    if (window.pusher && orderId) {
+        // Subscribe to customer notifications channel
+        const customerNotifications = window.pusher.subscribe('private-customer.notifications.' + {{ auth()->id() }});
+        
+        // Also subscribe to specific order channel
+        const orderChannel = window.pusher.subscribe('private-order.' + orderId);
+        
+        // Listen for order status updates
+        const handleStatusUpdate = function(data) {
+            if (data.order_id == orderId && data.message) {
+                console.log('✓ تحديث مباشر من الإدارة: ' + data.message);
+                lastStatus = data.status;
+                
+                // Show notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-24 right-4 bg-success text-on-success px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.innerHTML = '<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xl">check_circle</span><span>' + data.message + '</span></div>';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.remove(), 4000);
+                
+                // Reload page to show updated status
+                setTimeout(() => location.reload(), 1500);
+            }
+        };
+        
+        customerNotifications.bind('order-status-updated', handleStatusUpdate);
+        orderChannel.bind('order-status-updated', handleStatusUpdate);
+    }
 })();
 </script>
 @endsection

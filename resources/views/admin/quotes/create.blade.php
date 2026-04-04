@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'إنشاء عرض سعر - نيل هارفست')
+@section('title', 'إنشاء عرض سعر - حصاد')
 
 @section('content')
 <div class="min-h-screen bg-surface p-6 md:p-12">

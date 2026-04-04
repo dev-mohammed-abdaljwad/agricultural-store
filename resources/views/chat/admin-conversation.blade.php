@@ -1,29 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.chat')
 
-@section('content')
-<div class="min-h-screen bg-gradient-to-b from-primary/5 to-white" dir="rtl">
-    <!-- Header -->
-    <div class="sticky top-0 z-40 bg-white border-b border-surface-200 shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-surface-900">{{ __('messages.order') }} #{{ $order->order_number }}</h1>
-                    <p class="text-sm text-surface-500 mt-1">
-                        {{ __('messages.with') }} {{ $conversation->customer->name }}
-                    </p>
-                </div>
-                <a href="{{ route('admin.chat.index') }}" class="text-primary hover:text-primary-dark transition">
-                    <i class="material-symbols-outlined">arrow_back</i>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <!-- Customer Info Sidebar -->
+@section('chat-content')
+<div class="h-full overflow-hidden flex flex-col" dir="rtl">
+    <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 overflow-hidden flex flex-col">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+            <!-- Order Info Sidebar -->
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs sticky top-20">
+                <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs sticky top-20 max-h-96 overflow-y-auto">
                     <h3 class="font-bold text-surface-900 mb-4">{{ __('messages.customer_info') }}</h3>
 
                     <div class="mb-6">
@@ -63,8 +46,15 @@
             </div>
 
             <!-- Chat Area -->
-            <div class="lg:col-span-3">
-                <div class="bg-white rounded-2xl border border-surface-200 shadow-md overflow-hidden flex flex-col" style="height: 700px;">
+            <div class="lg:col-span-3 flex flex-col h-full">
+                <!-- Title Header -->
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-surface-900">{{ __('messages.order') }} #{{ $order->order_number }}</h2>
+                    <p class="text-sm text-surface-500">{{ __('messages.with') }} {{ $conversation->customer->name }}</p>
+                </div>
+
+                <!-- Messages Container -->
+                <div class="bg-white rounded-2xl border border-surface-200 shadow-md overflow-hidden flex flex-col flex-1">
                     <!-- Messages Area -->
                     <div id="messagesContainer" class="flex-1 overflow-y-auto p-6 bg-surface-50 space-y-4">
                         @forelse($messages as $message)
@@ -167,37 +157,56 @@
     const currentUserId = {{ auth()->id() }};
     const messagesContainer = document.getElementById('messagesContainer');
 
-    // Initialize Laravel Echo
-    @isset($PUSHER_APP_KEY)
-    window.Echo = new Echo({
-        broadcaster: 'pusher',
-        key: '{{ $PUSHER_APP_KEY }}',
-        cluster: '{{ $PUSHER_APP_CLUSTER }}',
-        encrypted: true,
-        authEndpoint: '/broadcasting/auth',
-    });
-
-    // Subscribe to conversation channel
-    window.Echo.private('conversation.' + conversationId)
-        .listen('message.sent', (data) => {
-            appendMessage(data.message, data.sender);
+    // Subscribe to conversation channel via Pusher (already initialized in layout)
+    @if(config('broadcasting.default') === 'pusher')
+    if (typeof window.pusher !== 'undefined') {
+        const channel = window.pusher.subscribe('private-conversation.' + conversationId);
+        
+        channel.bind('message.sent', (data) => {
+            // Don't add our own messages (already added from form submission)
+            if (data.sender.id !== currentUserId) {
+                appendMessage(data.message, data.sender);
+            }
         });
+        
+        channel.bind('pusher:subscription_error', (error) => {
+            console.error('[AdminChat] Subscription error:', error);
+        });
+        
+        console.log('[AdminChat] ✅ Subscribed to conversation');
+    } else {
+        console.warn('[AdminChat] Pusher not initialized');
+    }
     @endif
 
     // Send message
     document.getElementById('sendMessageForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const formData = new FormData(e.target);
-        const body = formData.get('body')?.trim();
-        const attachment = formData.get('attachment');
+        const body = document.getElementById('messageInput').value.trim();
+        const attachmentInput = document.getElementById('attachmentInput');
+        const attachment = attachmentInput?.files[0];
 
         if (!body && !attachment) {
-            alert('{{ __('messages.message_empty') }}');
+            showError('{{ __('messages.message_empty') }}');
             return;
         }
 
         try {
+            // Build FormData with only non-empty fields
+            const formData = new FormData();
+            formData.append('_token', document.querySelector('[name="_token"]').value);
+            
+            // Only append body if it has content
+            if (body) {
+                formData.append('body', body);
+            }
+            
+            // Only append attachment if file is selected
+            if (attachment) {
+                formData.append('attachment', attachment);
+            }
+            
             const response = await fetch(`/admin/conversations/{{ $conversation->id }}/messages`, {
                 method: 'POST',
                 headers: {
@@ -216,7 +225,7 @@
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('{{ __('messages.send_error') }}');
+            showError('{{ __('messages.send_error') }}');
         }
     });
 

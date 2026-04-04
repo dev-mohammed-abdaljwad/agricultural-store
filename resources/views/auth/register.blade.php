@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تسجيل مزارع - نيل هارفست')
+@section('title', 'تسجيل مزارع - حصاد')
 
 @section('content')
 <main class="flex-grow pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
@@ -171,7 +171,7 @@
                         <label for="terms" class="text-xs sm:text-sm text-outline font-body leading-relaxed">
                             من خلال النقر على "إنشاء الحساب"، فإنك توافق على 
                             <a class="underline text-primary" href="#">شروط الخدمة</a> و 
-                            <a class="underline text-primary" href="#">سياسة الخصوصية</a> الخاصة بنيل هارفست.
+                            <a class="underline text-primary" href="#">سياسة الخصوصية</a> الخاصة بحصاد.
                         </label>
                     </div>
                 </div>
@@ -225,7 +225,7 @@
             });
             
             if (!isValid) {
-                alert('يرجى ملء جميع الحقول المطلوبة');
+                showError('يرجى ملء جميع الحقول المطلوبة');
                 return;
             }
             

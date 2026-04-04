@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         $admin = User::updateOrCreate(
             ['email' => 'admin@nileharvest.com'],
             [
-                'name' => 'Nile Harvest Admin',
+                'name' => 'حصاد Admin',
                 'phone' => '+201001234567',
                 'password' => Hash::make('password'),
                 'role' => 'admin',

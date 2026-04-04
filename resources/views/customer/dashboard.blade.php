@@ -1,10 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
-@section('title', 'لوحة التحكم - نيل هارفست')
+@section('title', 'لوحة التحكم - حصاد')
 
 @section('content')
 <!-- Header -->
-<x-header />
 
 <!-- Main Dashboard -->
 <main class="flex-grow pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">

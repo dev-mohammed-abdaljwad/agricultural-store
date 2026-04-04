@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "nile-harvest-auth",
-    "name": "Nile Harvest - Auth Module",
-    "description": "Complete test collection for Nile Harvest Agricultural Marketplace Auth endpoints",
+    "name": "حصاد - Auth Module",
+    "description": "Complete test collection for حصاد Agricultural Marketplace Auth endpoints",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -343,7 +343,7 @@
           "response": []
         }
       ],
-      "description": "Authentication endpoints for Nile Harvest API"
+      "description": "Authentication endpoints for حصاد API"
     },
     {
       "name": "Test Scenarios",

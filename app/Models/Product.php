@@ -12,13 +12,23 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'category_id', 'name', 'description', 'unit',
-        'min_order_qty', 'is_certified',
+        'category_id', 'name', 'description',
+        'is_certified',
         'data_sheet_url', 'usage_instructions',
         'safety_instructions', 'manufacturer_info',
         'expert_tip', 'expert_name', 'expert_title', 'expert_image_url',
         'supplier_name', 'supplier_code',
         'status',
+        // New pesticide/product details
+        'chemical_composition',
+        'package_sizes',
+        'how_it_works',
+        'extended_description',
+        'frac_group',
+        'benefits',
+        'usage_recommendations',
+        'safety_notice',
+        'registration_number',
     ];
 
     protected $casts = ['is_certified' => 'boolean'];
@@ -28,6 +38,14 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get all crops this product is used for
+     */
+    public function crops()
+    {
+        return $this->belongsToMany(Crop::class, 'crop_product');
     }
 
     public function images()

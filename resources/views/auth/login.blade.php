@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'تسجيل الدخول - نيل هارفست')
+@section('title', 'تسجيل الدخول - حصاد')
 
 @section('content')
 <main class="min-h-screen flex flex-col-reverse lg:flex-row-reverse">

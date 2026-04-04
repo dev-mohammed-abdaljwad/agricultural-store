@@ -1,10 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
-@section('title', 'الرئيسية - نيل هارفست')
+@section('title', 'الرئيسية - حصاد')
 
 @section('content')
 <!-- Header -->
-<x-header />
 
 <!-- Main Content -->
 <main class="flex-grow pt-20 sm:pt-24 md:pt-28 pb-16 sm:pb-20 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto w-full">
@@ -60,7 +59,7 @@
         <section class="lg:col-span-7">
             <div class="bg-surface-container-lowest rounded-xl md:rounded-3xl p-6 sm:p-8 md:p-12 editorial-shadow border border-outline-variant/15">
                 <header class="mb-8 sm:mb-10">
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-headline font-black text-primary mb-3 sm:mb-4">اكتشف منصة نيل هارفست</h1>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-headline font-black text-primary mb-3 sm:mb-4">اكتشف منصة حصاد</h1>
                     <p class="text-sm sm:text-base md:text-lg text-on-surface-variant font-body leading-relaxed mb-6 sm:mb-8">
                         منصة متكاملة توفر للمزارعين المصريين أفضل المنتجات الزراعية والخدمات الاستشارية المتخصصة، مع ضمان أسعار تنافسية وتوصيل سريع إلى جميع أنحاء الجمهورية.
                     </p>

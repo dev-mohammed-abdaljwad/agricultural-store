@@ -1,13 +1,13 @@
 <!-- Footer -->
 <footer class="w-full py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-8 mt-auto bg-surface-container-low border-t border-outline-variant/10">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row-reverse justify-between items-center gap-4 sm:gap-6 text-xs sm:text-sm font-label">
-        <div class="text-base sm:text-lg font-bold text-primary font-headline">نيل هارفست</div>
+        <div class="text-base sm:text-lg font-bold text-primary font-headline">حصاد</div>
         <div class="flex flex-row-reverse gap-4 sm:gap-8 flex-wrap justify-center">
             <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">سياسة الخصوصية</a>
             <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">الشروط والأحكام</a>
             <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">دليل المزارع</a>
         </div>
-        <div class="text-on-surface-variant text-xs sm:text-sm text-center md:text-right">© ٢٠٢٤ نيل هارفست - جودة الأرض المصرية</div>
+        <div class="text-on-surface-variant text-xs sm:text-sm text-center md:text-right">© ٢٠٢٤ حصاد - جودة الأرض المصرية</div>
     </div>
 </footer>
 

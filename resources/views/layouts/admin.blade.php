@@ -98,13 +98,15 @@
 </head>
 
 <body class="flex min-h-screen bg-surface">
+    <x-toast-container />
+    
     <!-- SIDEBAR -->
     <aside id="adminSidebar" class="fixed right-0 top-0 h-screen w-64 z-40 bg-[#154212]
                                    transform translate-x-full lg:translate-x-0
                                    transition-transform duration-300 ease-in-out">
         <!-- Brand Section -->
         <div class="px-6 py-5 border-b border-white/10">
-            <h1 class="text-xl font-black italic text-white font-headline">Nile Harvest</h1>
+            <h1 class="text-xl font-black italic text-white font-headline">حصاد</h1>
             <p class="text-xs text-white/50 mt-1">لوحة الإدارة</p>
         </div>
 
@@ -411,6 +413,9 @@
             });
         });
     </script>
+
+    <!-- Universal Modal Component -->
+    @include('components.modal')
 </body>
 
 </html>

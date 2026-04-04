@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', $product->name . ' - نيل هارفست')
+@section('title', $product->name . ' - حصاد')
 
 @section('content')
 <div class="min-h-screen">
@@ -84,14 +84,14 @@
                         <!-- Quantity Section -->
                         <form action="{{ route('cart.add', $product) }}" method="POST" class="space-y-3">
                             @csrf
-                            <label class="text-sm font-bold text-on-surface">الكمية ({{ $product->unit ?? 'عبوة' }})</label>
+                            <label class="text-sm font-bold text-on-surface">الكمية</label>
                             <div class="flex items-center gap-4">
                                 <div class="flex bg-surface-container-highest rounded-md overflow-hidden flex-row-reverse">
                                     <button type="button" class="p-3 hover:bg-outline-variant transition-colors" onclick="decreaseQty()">
                                         <span class="material-symbols-outlined text-sm">remove</span>
                                     </button>
-                                    <input type="number" id="quantity" name="quantity" value="{{ $product->min_order_qty ?? 1 }}" 
-                                           min="{{ $product->min_order_qty ?? 1 }}"
+                                    <input type="number" id="quantity" name="quantity" value="1" 
+                                           min="1"
                                            class="w-16 text-center font-bold bg-transparent outline-none">
                                     <button type="button" class="p-3 hover:bg-outline-variant transition-colors" onclick="increaseQty()">
                                         <span class="material-symbols-outlined text-sm">add</span>

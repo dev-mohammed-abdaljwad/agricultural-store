@@ -18,6 +18,10 @@ class AddAttachmentsToMessagesTable extends Migration
                 $table->enum('attachment_type', ['image', 'file'])->nullable()->after('attachment_url');
             }
 
+            if (!Schema::hasColumn('messages', 'attachment_name')) {
+                $table->string('attachment_name')->nullable()->after('attachment_type');
+            }
+
             // Make body nullable to allow attachment-only messages
             if (Schema::hasColumn('messages', 'body')) {
                 $table->text('body')->nullable()->change();
@@ -25,7 +29,7 @@ class AddAttachmentsToMessagesTable extends Migration
 
             // Add is_read if not exists
             if (!Schema::hasColumn('messages', 'is_read')) {
-                $table->boolean('is_read')->default(false)->after('attachment_type');
+                $table->boolean('is_read')->default(false)->after('attachment_name');
             }
         });
     }
@@ -39,6 +43,10 @@ class AddAttachmentsToMessagesTable extends Migration
 
             if (Schema::hasColumn('messages', 'attachment_type')) {
                 $table->dropColumn('attachment_type');
+            }
+
+            if (Schema::hasColumn('messages', 'attachment_name')) {
+                $table->dropColumn('attachment_name');
             }
 
             if (Schema::hasColumn('messages', 'is_read')) {

@@ -7,6 +7,9 @@ use App\Http\Controllers\Web\QuoteController;
 use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\Web\CartController;
 use App\Http\Controllers\Web\ChatController;
+use App\Http\Controllers\Web\SettingsController;
+use App\Http\Controllers\AdminSettingsController;
+
 use App\Http\Controllers\Web\AdminOrderController;
 use App\Http\Controllers\VendorDashboardController;
 use App\Http\Controllers\AdminDashboardController;
@@ -72,11 +75,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/quotes/{quote}/accept', [OrderController::class, 'acceptQuote'])->name('customer.orders.acceptQuote');
     Route::post('/orders/{order}/quotes/{quote}/reject', [OrderController::class, 'rejectQuote'])->name('customer.orders.rejectQuote');
     
+    // Order Status Check (for AJAX)
+    Route::get('/orders/{order}/status-check', [OrderController::class, 'statusCheck'])->name('orders.statusCheck');
+    
     // Messages
     Route::post('/orders/{order}/messages', [OrderController::class, 'createMessage'])->name('orders.messages.create');
     
     // General Chat Routes (Customer to Admin)
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/unread-count', [ChatController::class, 'unreadCount'])->name('chat.unreadCount');
+    Route::post('/chat/start', [ChatController::class, 'startChatJson'])->name('chat.start.json');
+    Route::get('/chat-list', [ChatController::class, 'index'])->name('chat.index');
+    
+
+    // Other Chat Routes
     Route::get('/chat/{user}', [ChatController::class, 'startChat'])->name('chat.start');
     Route::get('/conversations/{conversation}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
@@ -84,6 +95,14 @@ Route::middleware('auth')->group(function () {
     // Quotes Routes
     Route::post('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
     Route::get('/quotes', [QuoteController::class, 'index'])->name('quotes.index');
+    
+    // Settings Routes
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.updateProfile');
+    Route::post('/settings/password', [SettingsController::class, 'changePassword'])->name('settings.changePassword');
+    Route::post('/settings/language', [SettingsController::class, 'updateLanguage'])->name('settings.updateLanguage');
+    Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.updateNotifications');
+    Route::post('/settings/delete-account', [SettingsController::class, 'deleteAccount'])->name('settings.deleteAccount');
     
     // Show Order Details (Legacy)
     Route::get('/orders/{order}/details', [OrderController::class, 'show'])->name('orders.show');
@@ -98,7 +117,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminDashboardController::class, 'users'])->name('users.index');
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
-    Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('settings');
+    
+    // Admin Settings Routes
+    Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings');
+    Route::post('/settings/profile', [AdminSettingsController::class, 'updateProfile'])->name('settings.updateProfile');
+    Route::post('/settings/password', [AdminSettingsController::class, 'changePassword'])->name('settings.changePassword');
+    Route::post('/settings/language', [AdminSettingsController::class, 'updateLanguage'])->name('settings.updateLanguage');
+    Route::post('/settings/notifications', [AdminSettingsController::class, 'updateNotifications'])->name('settings.updateNotifications');
+    
     
     // Order management routes
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
@@ -127,6 +153,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/quotes/{quote}', [AdminQuoteController::class, 'destroy'])->name('quotes.destroy');
     
     // Admin Chat Routes (Support Conversations)
+    Route::get('/chat/unread-count', [ChatController::class, 'unreadCount'])->name('chat.unreadCount');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/conversations/{conversation}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/conversations/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');

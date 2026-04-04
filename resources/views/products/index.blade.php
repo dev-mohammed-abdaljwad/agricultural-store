@@ -1,6 +1,6 @@
 @extends('layouts.customer')
 
-@section('title', 'السوق الزراعي - نيل هارفست')
+@section('title', 'السوق الزراعي - حصاد')
 
 @section('content')
 <!-- Main Content -->
@@ -68,10 +68,6 @@
                     <span class="text-on-surface-variant text-xs font-headline mb-1">{{ $product->category->name }}</span>
                     <h3 class="text-lg font-black text-primary font-headline mb-4 leading-tight">{{ $product->name }}</h3>
                     <div class="mt-auto">
-                        <p class="text-sm text-secondary font-medium font-headline mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-base">inventory_2</span>
-                            الحد الأدنى: {{ $product->min_order_qty }} {{ $product->unit }}
-                        </p>
                         <a href="{{ route('products.show', $product) }}"
                            class="w-full py-3 bg-primary-fixed text-on-primary-fixed font-bold rounded-xl font-headline transition-all active:scale-95 hover:bg-primary-fixed/90 text-center block">
                             اطلب عرض سعر

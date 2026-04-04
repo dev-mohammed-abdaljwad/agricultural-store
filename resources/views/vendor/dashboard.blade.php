@@ -1,6 +1,6 @@
 @extends('layouts.vendor')
 
-@section('title', 'لوحة التحكم - نيل هارفست للتجار')
+@section('title', 'لوحة التحكم - حصاد للتجار')
 
 @section('content')
 <main class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6 md:space-y-12 pb-20">

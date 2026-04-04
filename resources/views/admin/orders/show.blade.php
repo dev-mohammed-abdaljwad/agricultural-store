@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'تفاصيل الطلب - نيل هارفست')
+@section('title', 'تفاصيل الطلب - حصاد')
 
 @section('content')
 <main class="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full space-y-6 pb-20">

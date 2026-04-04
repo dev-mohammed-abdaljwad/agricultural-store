@@ -14,7 +14,7 @@
     
     {{-- Description --}}
     <p class="text-on-surface-variant text-sm sm:text-base md:text-lg mb-8 sm:mb-10 max-w-lg font-body leading-relaxed">
-        شكراً لثقتك في نيل هارفست. طلبك الآن في مرحلة المعالجة وسيتم التواصل معك قريباً.
+        شكراً لثقتك في حصاد. طلبك الآن في مرحلة المعالجة وسيتم التواصل معك قريباً.
     </p>
     
     {{-- Order Metadata --}}

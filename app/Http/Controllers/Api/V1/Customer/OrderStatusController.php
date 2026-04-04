@@ -14,18 +14,30 @@ class OrderStatusController extends Controller
      */
     public function getStatus(Order $order): JsonResponse
     {
-        // Verify user owns this order
-        if ($order->customer_id !== auth()->id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        try {
+            // Verify user is authenticated
+            if (!auth()->check()) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
+
+            // Verify user owns this order
+            if ($order->customer_id !== auth()->id()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            // Refresh order from database to get latest status
+            $order->refresh();
+
+            return response()->json([
+                'status' => $order->status,
+                'status_label' => $order->getStatusLabel(),
+                'updated_at' => $order->updated_at,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch order status',
+                'message' => $e->getMessage(),
+            ], 500);
         }
-
-        // Refresh order from database to get latest status
-        $order->refresh();
-
-        return response()->json([
-            'status' => $order->status,
-            'status_label' => $order->getStatusLabel(),
-            'updated_at' => $order->updated_at,
-        ]);
     }
 }

@@ -39,10 +39,12 @@
         
         {{-- Summary Sidebar --}}
         <div class="md:col-span-1">
-            <x-order.cart-summary 
-                :itemCount="$itemCount ?? count($items)"
-                :totalWeight="$totalWeight ?? 0"
-            />
+            @if($itemCount > 0)
+                <x-order.cart-summary 
+                    :itemCount="$itemCount ?? count($items)"
+                    :totalWeight="$totalWeight ?? 0"
+                />
+            @endif
         </div>
     </div>
 </main>

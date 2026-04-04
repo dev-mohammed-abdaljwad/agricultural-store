@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    <title>@yield('title', 'نيل هارفست')</title>
+    <title>@yield('title', 'حصاد')</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Tajawal:wght@400;500;700;800;900&family=Almarai:wght@400;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -123,12 +123,41 @@
     @stack('styles')
 </head>
 <body class="bg-surface text-on-surface min-h-screen flex flex-col">
+    <x-toast-container />
+    
     @yield('content')
     
-    <!-- Floating Chat Widget -->
+    <!-- Pusher JavaScript SDK -->
     @auth
-        @include('components.chat.floating-widget')
+        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+        
+        <!-- Initialize Pusher -->
+        <script>
+            if ('{{ env("BROADCAST_DRIVER") }}' === 'pusher') {
+                window.pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
+                    cluster: '{{ env("PUSHER_APP_CLUSTER", "eu") }}',
+                    forceTLS: true,
+                    authEndpoint: '/broadcasting/auth',
+                    auth: {
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }
+                });
+                console.log('[Pusher] ✅ Initialized with cluster: {{ env("PUSHER_APP_CLUSTER", "eu") }}');
+            } else {
+                console.warn('[Pusher] Broadcast driver is not Pusher, real-time features may be unavailable');
+            }
+        </script>
+        
+        <!-- Chat Pusher Integration (deprecated - using full-page chat views instead) -->
+        <!-- Disabled: PopupManager and auto-popup features -->
+        <!-- <script src="{{ asset('js/chat/PopupManager.js') }}"></script> -->
+        <!-- <script src="{{ asset('js/chat/chat-pusher.js') }}"></script> -->
     @endauth
+    
+    <!-- Universal Modal Component -->
+    @include('components.modal')
     
     @stack('scripts')
 </body>

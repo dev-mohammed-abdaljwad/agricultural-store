@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'لوحة التحكم - نيل هارفست')
+@section('title', 'لوحة التحكم - حصاد')
 
 @section('content')
 <!-- Welcome Header -->
 <section class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-6 mb-8 lg:mb-12">
     <div>
         <h2 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black font-headline text-primary mb-2 tracking-tight">أهلاً بك، {{ Auth::user()->name }}</h2>
-        <p class="text-sm lg:text-base text-on-surface-variant max-w-2xl">نظرة سريعة على أداء منصة نيل هارفست اليوم</p>
+        <p class="text-sm lg:text-base text-on-surface-variant max-w-2xl">نظرة سريعة على أداء منصة حصاد اليوم</p>
     </div>
     <div class="flex gap-3">
         <button class="px-4 lg:px-6 py-2 lg:py-3 bg-surface-container-low text-on-surface font-bold text-sm lg:text-base rounded-xl flex items-center gap-2 hover:bg-surface-container transition-colors flex-shrink-0">
@@ -322,7 +322,7 @@
         
         if (!name || !categoryId) {
             e.preventDefault();
-            alert('يرجى ملء الحقول المطلوبة (اسم المنتج والفئة)');
+            showError('يرجى ملء الحقول المطلوبة (اسم المنتج والفئة)');
         }
     });
 </script>

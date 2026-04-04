@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Jobs\NotifyAdminOfNewOrder;
+use App\Events\OrderStatusUpdated;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
@@ -30,12 +31,6 @@ class OrderService
             if ($product->status !== 'active') {
                 throw ValidationException::withMessages([
                     'items' => ["Product {$product->name} is not available."],
-                ]);
-            }
-
-            if ($product->min_order_qty > $item['quantity']) {
-                throw ValidationException::withMessages([
-                    'items' => ["Minimum order qty for {$product->name} is {$product->min_order_qty}."],
                 ]);
             }
 
@@ -114,10 +109,14 @@ class OrderService
      */
     public function updateOrderStatus(Order $order, string $newStatus, string $description = null): Order
     {
+        $oldStatus = $order->status;
         $order->update(['status' => $newStatus]);
 
         // Add tracking entry
         OrderTrackingService::record($order, $newStatus);
+        
+        // Broadcast status change via Pusher
+        OrderStatusUpdated::dispatch($order, $oldStatus, $newStatus);
 
         return $order->refresh()->load('items', 'activeQuote', 'tracking', 'conversation');
     }

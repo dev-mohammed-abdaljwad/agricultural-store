@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Conversation;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -17,25 +18,38 @@ class MessageSent implements ShouldBroadcast
     public int $conversationId;
     public array $messageData;
     public array $senderData;
+    public ?int $receiverId = null;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(int $conversationId, array $messageData, array $senderData)
+    public function __construct(int $conversationId, array $messageData, array $senderData, ?int $receiverId = null)
     {
         $this->conversationId = $conversationId;
         $this->messageData = $messageData;
         $this->senderData = $senderData;
+        $this->receiverId = $receiverId;
     }
 
     /**
      * Get the channels the event should broadcast on.
+     * 
+     * Broadcasts to:
+     * 1. Private conversation channel (for real-time updates in full chat page)
+     * 2. Receiver's notification channel (for popup auto-open)
      */
     public function broadcastOn(): array
     {
-        return [
+        $channels = [
             new PrivateChannel('conversation.' . $this->conversationId),
         ];
+
+        // Also broadcast to receiver's notification channel for popup auto-open
+        if ($this->receiverId) {
+            $channels[] = new PrivateChannel('notifications.' . $this->receiverId);
+        }
+
+        return $channels;
     }
 
     /**
@@ -46,6 +60,7 @@ class MessageSent implements ShouldBroadcast
         return [
             'message' => $this->messageData,
             'sender' => $this->senderData,
+            'conversation_id' => $this->conversationId,
         ];
     }
 

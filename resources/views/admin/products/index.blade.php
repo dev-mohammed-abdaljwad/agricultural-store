@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'إدارة المنتجات - نيل هارفست')
+@section('title', 'إدارة المنتجات - حصاد')
 
 @section('content')
 <div class="flex flex-col gap-6 lg:gap-8">
@@ -107,12 +107,6 @@
                             <td class="px-3 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm hidden sm:table-cell">
                                 {{ substr($product->category?->name ?? 'بدون', 0, 15) }}
                             </td>
-                            <td class="px-3 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-bold hidden lg:table-cell">
-                                {{ $product->unit ?? '-' }}
-                            </td>
-                            <td class="px-3 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm font-bold hidden md:table-cell">
-                                {{ $product->min_order_qty ?? 1 }}
-                            </td>
                             <td class="px-3 lg:px-6 py-3 lg:py-4 hidden lg:table-cell">
                                 @if($product->is_certified)
                                     <span class="inline-flex items-center gap-1 px-2 lg:px-3 py-1 bg-primary-fixed text-primary rounded-full text-[10px] lg:text-xs font-bold">
@@ -176,41 +170,44 @@
         console.log('handleDeleteProduct called with ID:', productId, 'Type:', typeof productId);
         
         if (!productId) {
-            alert('خطأ: لم يتم العثور على معرف المنتج.');
+            showError('لم يتم العثور على معرف المنتج');
             return;
         }
         
-        if (!confirm('هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
-            return;
-        }
-        
-        // Create and submit a hidden form for DELETE request
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/admin/products/${productId}`;
-        form.style.display = 'none';
-        
-        // Add CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]');
-        if (csrfToken) {
-            const tokenInput = document.createElement('input');
-            tokenInput.type = 'hidden';
-            tokenInput.name = '_token';
-            tokenInput.value = csrfToken.content;
-            form.appendChild(tokenInput);
-        }
-        
-        // Add method spoofing for DELETE
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'DELETE';
-        form.appendChild(methodInput);
-        
-        console.log('Submitting form to:', form.action);
-        
-        document.body.appendChild(form);
-        form.submit();
+        showDeleteConfirm(
+            'حذف المنتج',
+            'هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.',
+            () => {
+                // Create and submit a hidden form for DELETE request
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/products/${productId}`;
+                form.style.display = 'none';
+                
+                // Add CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (csrfToken) {
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '_token';
+                    tokenInput.value = csrfToken.content;
+                    form.appendChild(tokenInput);
+                }
+                
+                // Add method spoofing for DELETE
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'DELETE';
+                form.appendChild(methodInput);
+                
+                console.log('Submitting form to:', form.action);
+                
+                document.body.appendChild(form);
+                form.submit();
+            },
+            'حذف'
+        );
     }
 </script>
 

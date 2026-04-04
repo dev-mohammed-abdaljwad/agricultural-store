@@ -2,7 +2,7 @@
 <nav class="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-md flex flex-row-reverse justify-between items-center px-4 sm:px-8 h-16 shadow-sm">
     <div class="flex items-center gap-4 sm:gap-8">
         <a href="{{ route('home') }}" class="text-xl sm:text-2xl font-black text-primary tracking-tight font-headline">
-            Nile Harvest
+            حصاد
         </a>
         <div class="hidden lg:flex flex-row-reverse items-center gap-6">
             <a class="text-on-surface-variant hover:text-primary font-headline font-bold text-sm lg:text-lg transition-colors duration-200 {{ request()->routeIs('home') ? 'text-primary relative after:content-[\'\'] after:absolute after:-bottom-1 after:right-0 after:w-full after:h-1 after:bg-primary-fixed after:rounded-full' : '' }}" 
@@ -48,7 +48,7 @@
                             الملف الشخصي
                         </a>
                         
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors text-sm font-headline">
+                        <a href="{{ route('settings') }}" class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors text-sm font-headline">
                             <span class="material-symbols-outlined text-lg">settings</span>
                             الإعدادات
                         </a>
@@ -86,7 +86,7 @@
                             الملف الشخصي
                         </a>
                         
-                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors text-sm font-headline">
+                        <a href="{{ route('settings') }}" class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors text-sm font-headline">
                             <span class="material-symbols-outlined text-lg">settings</span>
                             الإعدادات
                         </a>

@@ -24,6 +24,11 @@ class ProductImage extends Model
     {
         $url = $this->url;
         
+        // If it's an absolute URL (http/https), return as-is
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+        
         // Ensure URL starts with /storage/
         if (!str_starts_with($url, '/storage/')) {
             // If it's just the filename path from Laravel's store()
