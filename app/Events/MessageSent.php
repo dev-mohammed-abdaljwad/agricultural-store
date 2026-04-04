@@ -41,12 +41,12 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         $channels = [
-            new PrivateChannel('conversation.' . $this->conversationId),
+            new PrivateChannel('conversation_' . $this->conversationId),
         ];
 
         // Also broadcast to receiver's notification channel for popup auto-open
         if ($this->receiverId) {
-            $channels[] = new PrivateChannel('notifications.' . $this->receiverId);
+            $channels[] = new PrivateChannel('notifications_' . $this->receiverId);
         }
 
         return $channels;

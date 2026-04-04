@@ -9,13 +9,22 @@ use App\Http\Controllers\Web\CartController;
 use App\Http\Controllers\Web\ChatController;
 use App\Http\Controllers\Web\SettingsController;
 use App\Http\Controllers\AdminSettingsController;
+use App\Http\Controllers\AdminCategoryController;
 
 use App\Http\Controllers\Web\AdminOrderController;
 use App\Http\Controllers\VendorDashboardController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminProductController;
 use App\Http\Controllers\AdminQuoteController;
+use App\Http\Controllers\BroadcastAuthController;
 use Illuminate\Support\Facades\Route;
+
+/**
+ * Broadcasting Routes
+ * These routes handle Pusher private channel authentication.
+ * Must be accessible to authenticated users only.
+ */
+Route::post('/broadcasting/auth', [BroadcastAuthController::class, 'authenticate'])->middleware('auth');
 
 /**
  * Public Routes
@@ -139,6 +148,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
     Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+    
+    // Category management routes
+    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/categories/{category}/toggle-active', [AdminCategoryController::class, 'toggleActive'])->name('categories.toggleActive');
     
     // Quote management routes
     Route::get('/quotes', [AdminQuoteController::class, 'index'])->name('quotes.index');

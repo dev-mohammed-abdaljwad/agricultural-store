@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Top Navigation -->
-<nav class="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-md flex flex-row-reverse justify-between items-center px-4 sm:px-6 md:px-8 h-16 shadow-sm">
+<nav class="fixed top-0 w-full z-50 bg-[#fafaf5]/80 backdrop-blur-md flex flex-row-reverse justify-between items-center px-4 sm:px-6 md:px-8 h-16 shadow-sm overflow-x-hidden">
     <div class="flex items-center gap-4 sm:gap-6 md:gap-8">
         <a href="{{ route('home') }}" class="text-xl sm:text-2xl font-black text-primary tracking-tight font-headline">
             حصاد
@@ -29,8 +29,8 @@
     </div>
 </nav>
 
-<main class="pt-20 sm:pt-24 pb-12 px-4 sm:px-6 md:px-8">
-    <div class="max-w-4xl mx-auto">
+<main class="pt-20 sm:pt-24 pb-12 px-3 sm:px-4 md:px-6 lg:px-8 overflow-x-hidden">
+    <div class="max-w-5xl mx-auto w-full">
         <!-- Flash Messages -->
         @if(session('success'))
             <div class="mb-8 p-3 sm:p-4 bg-success-container text-on-success-container rounded-lg border-r-4 border-success flex items-center gap-2 sm:gap-3 text-xs sm:text-base" role="alert">
@@ -45,6 +45,19 @@
                 <p>{{ session('error') }}</p>
             </div>
         @endif
+        
+        @php
+            // Calculate effective status for display
+            $displayStatus = $order->status;
+            if ($order->status === 'pending' && $order->quote) {
+                $displayStatus = 'quote_pending';
+            }
+            if (($order->status === 'pending' || $order->status === 'quote_pending') && 
+                $order->quote && $order->quote->status === 'accepted') {
+                $displayStatus = 'quote_accepted';
+            }
+        @endphp
+        
         <!-- Header -->
         <div class="flex flex-col sm:flex-row-reverse sm:justify-between sm:items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div class="flex-1">
@@ -54,37 +67,9 @@
                 </p>
             </div>
             <span class="px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm md:text-base flex-shrink-0 whitespace-nowrap
-                @if($order->status === 'pending') bg-warning text-on-warning
-                @elseif($order->status === 'quote_pending') bg-info text-on-info
-                @elseif($order->status === 'quote_accepted') bg-success text-on-success
-                @elseif($order->status === 'shipped') bg-secondary text-on-secondary
-                @elseif($order->status === 'delivered') bg-primary text-on-primary
-                @elseif($order->status === 'rejected') bg-error text-on-error
-                @else bg-surface-container text-on-surface
-                @endif"
-                data-order-status="{{ $order->status }}">
-                @switch($order->status)
-                    @case('pending')
-                        قيد المراجعة
-                        @break
-                    @case('quote_pending')
-                        في انتظار عرض السعر
-                        @break
-                    @case('quote_accepted')
-                        تم التأكيد
-                        @break
-                    @case('shipped')
-                        قيد الشحن
-                        @break
-                    @case('delivered')
-                        تم التسليم
-                        @break
-                    @case('rejected')
-                        تم الرفض
-                        @break
-                    @default
-                        {{ $order->status }}
-                @endswitch
+                {{ \App\Helpers\OrderStatusHelper::getColorClass($displayStatus) }}"
+                data-order-status="{{ $displayStatus }}">
+                {{ \App\Helpers\OrderStatusHelper::translate($displayStatus) }}
             </span>
         </div>
 
@@ -102,15 +87,6 @@
                     <div class="space-y-4 sm:space-y-6">
                         @foreach($order->items as $item)
                             <div class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 pb-4 sm:pb-6 border-b border-outline-variant/15 last:border-b-0">
-                                @if($item->product->images->first())
-                                    <img src="{{ $item->product->images->first()->asset_url }}" alt="{{ $item->product->name }}"
-                                         class="w-full sm:w-20 h-32 sm:h-20 object-cover rounded-lg flex-shrink-0">
-                                @else
-                                    <div class="w-full sm:w-20 h-32 sm:h-20 bg-surface-container rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant">image</span>
-                                    </div>
-                                @endif
-                                
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-bold text-base sm:text-lg text-on-surface mb-1 sm:mb-2 truncate">{{ $item->product->name }}</h3>
                                     <p class="text-on-surface-variant text-xs sm:text-sm mb-2 sm:mb-3">
@@ -153,18 +129,26 @@
                             <div class="flex items-center justify-between py-3 border-b border-primary/20 last:border-b-0">
                                 <span class="text-on-surface">إجمالي البضاعة:</span>
                                 <span class="font-bold text-lg text-primary">
-                                    {{ number_format($order->items->reduce(fn($carry, $item) => $carry + ($item->total_price ?? 0), 0)) }} ج.م
+                                    @php
+                                        $totalGoods = $order->items->reduce(fn($carry, $item) => $carry + ($item->total_price ?? 0), 0) ?:
+                                                      $order->items->reduce(fn($carry, $item) => $carry + ($item->quantity * ($item->unit_price ?? 0)), 0);
+                                    @endphp
+                                    {{ number_format($totalGoods) }} ج.م
                                 </span>
                             </div>
-                            @if($order->quote->delivery_fee)
-                                <div class="flex items-center justify-between py-3 border-b border-primary/20">
-                                    <span class="text-on-surface flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-xl">local_shipping</span>
-                                        مصاريف الشحن:
-                                    </span>
-                                    <span class="font-bold text-lg text-primary">{{ number_format($order->quote->delivery_fee) }} ج.م</span>
-                                </div>
-                            @endif
+                            <div class="flex items-center justify-between py-3 border-b border-primary/20">
+                                <span class="text-on-surface flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-xl">local_shipping</span>
+                                    مصاريف الشحن:
+                                </span>
+                                <span class="font-bold text-lg text-primary">
+                                    @if($order->quote->delivery_fee && $order->quote->delivery_fee > 0)
+                                        {{ number_format($order->quote->delivery_fee) }} ج.م
+                                    @else
+                                        <span class="text-success">مجاني</span>
+                                    @endif
+                                </span>
+                            </div>
                             <div class="flex items-center justify-between py-4 bg-on-primary/10 rounded-lg px-4">
                                 <span class="font-bold text-lg text-on-surface">الإجمالي:</span>
                                 <span class="font-black text-2xl text-primary">{{ number_format($order->quote->total_amount) }} ج.م</span>
@@ -258,22 +242,36 @@
                     <div class="relative space-y-4">
                         @php
                             $statuses = [
-                                'pending' => ['عرض السعر', 'pending'],
-                                'quote_pending' => ['في انتظار العرض', 'quote_pending'],
-                                'quote_accepted' => ['تم التأكيد', 'quote_accepted'],
-                                'shipped' => ['قيد الشحن', 'shipped'],
-                                'delivered' => ['تم التسليم', 'delivered'],
+                                'pending',
+                                'quote_pending',
+                                'quote_accepted',
+                                'shipped',
+                                'delivered',
                             ];
-                            $statusOrder = array_keys($statuses);
-                            $currentIndex = array_search($order->status, $statusOrder);
+                            
+                            // Determine effective status based on actual business logic
+                            $effectiveStatus = $order->status;
+                            
+                            // If order is pending but has a quote, it's actually quote_pending
+                            if ($order->status === 'pending' && $order->quote) {
+                                $effectiveStatus = 'quote_pending';
+                            }
+                            
+                            // If order is quote_pending and quote is accepted, it's quote_accepted
+                            if (($order->status === 'pending' || $order->status === 'quote_pending') && 
+                                $order->quote && $order->quote->status === 'accepted') {
+                                $effectiveStatus = 'quote_accepted';
+                            }
+                            
+                            $currentIndex = array_search($effectiveStatus, $statuses);
                         @endphp
 
-                        @foreach($statusOrder as $idx => $status)
+                        @foreach($statuses as $idx => $status)
                             <div class="flex gap-4 items-start relative">
                                 <!-- Timeline Dot -->
                                 <div class="relative flex flex-col items-center">
                                     <div class="w-3 h-3 rounded-full mt-2 {{ $idx <= $currentIndex ? 'bg-primary' : 'bg-outline-variant' }}"></div>
-                                    @if($idx < count($statusOrder) - 1)
+                                    @if($idx < count($statuses) - 1)
                                         <div class="w-0.5 h-12 {{ $idx < $currentIndex ? 'bg-primary' : 'bg-outline-variant' }}"></div>
                                     @endif
                                 </div>
@@ -281,11 +279,17 @@
                                 <!-- Status Text -->
                                 <div class="pt-1">
                                     <p class="font-bold {{ $idx <= $currentIndex ? 'text-primary' : 'text-on-surface-variant' }}">
-                                        {{ $statuses[$status][0] }}
+                                        {{ \App\Helpers\OrderStatusHelper::translate($status) }}
                                     </p>
                                     @if($idx <= $currentIndex)
                                         <p class="text-xs text-on-surface-variant mt-1">
-                                            تم {{ $order->created_at->format('d/m/Y') }}
+                                            @if($status === 'quote_pending' && $order->quote)
+                                                تم {{ $order->quote->created_at->format('d/m/Y') }}
+                                            @elseif($status === 'quote_accepted' && $order->quote && $order->quote->accepted_at)
+                                                تم {{ $order->quote->updated_at->format('d/m/Y') }}
+                                            @else
+                                                تم {{ $order->created_at->format('d/m/Y') }}
+                                            @endif
                                         </p>
                                     @endif
                                 </div>
@@ -327,56 +331,15 @@
                     <p class="text-on-surface text-sm mb-6">
                         يمكنك التواصل مع فريق الدعم الخاص بنا أو مراسلة الإدارة مباشرة من خلال قسم الرسائل.
                     </p>
-                    <a href="{{ route('dashboard') }}" class="block text-center py-2 px-4 bg-secondary text-on-secondary font-bold rounded-lg hover:opacity-90 transition-all">
+                    <a href="{{ route('chat.index') }}" class="block text-center py-2 px-4 bg-secondary text-on-secondary font-bold rounded-lg hover:opacity-90 transition-all">
                         اذهب إلى الرسائل
                     </a>
                 </section>
             </div>
         </div>
 
-        <!-- Messages/Chat Section -->
-        @if($order->conversations->first())
-            <section class="bg-surface-container-high rounded-2xl p-8 editorial-shadow">
-                <h2 class="text-2xl font-bold text-primary font-headline mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined">chat</span>
-                    الرسائل
-                </h2>
-
-                <div class="space-y-4 max-h-96 overflow-y-auto mb-6 p-4 bg-surface-container rounded-lg">
-                    @foreach($order->conversations->first()->messages ?? [] as $message)
-                        <div class="flex {{ $message->sender_id === Auth::id() ? 'flex-row-reverse' : 'flex-row' }} gap-4">
-                            @if($message->sender_id === Auth::id())
-                                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                                    <span class="material-symbols-outlined text-sm text-on-primary">person</span>
-                                </div>
-                            @else
-                                <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                                    <span class="material-symbols-outlined text-sm text-on-secondary">support_agent</span>
-                                </div>
-                            @endif
-                            
-                            <div class="{{ $message->sender_id === Auth::id() ? 'flex-row-reverse' : 'flex-row' }} flex-1 space-x-2">
-                                <div class="{{ $message->sender_id === Auth::id() ? 'bg-primary text-on-primary ml-auto' : 'bg-surface-container-high' }} p-4 rounded-lg max-w-xs">
-                                    <p class="text-sm">{{ $message->content }}</p>
-                                </div>
-                                <p class="text-xs text-on-surface-variant pt-1">
-                                    {{ $message->created_at->format('H:i') }}
-                                </p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <!-- Message Input -->
-                <form method="POST" action="{{ route('orders.messages.create', $order->id) }}" class="flex gap-3">
-                    @csrf
-                    <input type="text" name="message" placeholder="أكتب رسالتك..." class="flex-1 px-4 py-3 bg-surface-container rounded-lg border border-outline-variant focus:border-primary outline-none transition-colors" required>
-                    <button type="submit" class="px-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-all">
-                        <span class="material-symbols-outlined">send</span>
-                    </button>
-                </form>
-            </section>
-        @endif
+        <!-- Chat Modal -->
+        <x-order.chat-modal :order="$order" />
     </div>
 </main>
 

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Broadcast;
  * Both participants in the conversation can access this channel.
  * When a message is sent, both users receive it via WebSocket.
  */
-Broadcast::channel('conversation.{conversationId}', function (User $user, string $conversationId) {
+Broadcast::channel('conversation_{conversationId}', function (User $user, string $conversationId) {
     $conversation = Conversation::find($conversationId);
 
     if (!$conversation) {
@@ -45,7 +45,7 @@ Broadcast::channel('conversation.{conversationId}', function (User $user, string
  * Only the user can receive notifications on their own channel.
  * This is used for unread count updates and initial notifications.
  */
-Broadcast::channel('notifications.{userId}', function (User $user, string $userId) {
+Broadcast::channel('notifications_{userId}', function (User $user, string $userId) {
     return (int) $user->id === (int) $userId;
 });
 

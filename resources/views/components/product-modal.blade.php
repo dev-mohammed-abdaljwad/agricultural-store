@@ -118,7 +118,97 @@
                     </div>
                 </div>
 
-                <!-- ===== SECTION 3: EXPERT & SUPPLIER ===== -->
+                <!-- ===== SECTION 3: PRODUCT/PESTICIDE DETAILS ===== -->
+                <div class="border-b border-stone-200 pb-6 sm:pb-8">
+                    <div class="flex items-center gap-2 mb-4 sm:mb-6">
+                        <span class="material-symbols-outlined text-primary text-lg sm:text-2xl">science</span>
+                        <h4 class="text-base sm:text-lg font-bold text-primary">تفاصيل المنتج والمحاصيل</h4>
+                    </div>
+                    <div class="flex flex-col gap-4 sm:gap-6">
+                        <!-- Extended Description -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">وصف تفصيلي موسع</label>
+                            <textarea id="extended_description" name="extended_description" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="وصف شامل وتفصيلي عن المنتج ومميزاته..." rows="3"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">معلومات تفصيلية إضافية عن المنتج</p>
+                        </div>
+
+                        <!-- Chemical Composition -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">التركيب الكيميائي</label>
+                            <textarea id="chemical_composition" name="chemical_composition" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="مثال: المادة الفعالة: أيمدوكلوبريد 20% SL" rows="2"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">المادة الفعالة والمكونات</p>
+                        </div>
+
+                        <!-- Package Sizes -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">أحجام الحزم المتوفرة</label>
+                            <textarea id="package_sizes" name="package_sizes" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="مثال: 250 مل، 500 مل، 1 لتر، 5 لتر" rows="2"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">الأحجام والعبوات المتاحة</p>
+                        </div>
+
+                        <!-- How It Works -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">كيفية العمل</label>
+                            <textarea id="how_it_works" name="how_it_works" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="شرح آلية عمل المنتج..." rows="2"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">آلية تأثير وعمل المنتج</p>
+                        </div>
+
+                        <!-- Benefits -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">الفوائد الرئيسية</label>
+                            <textarea id="benefits" name="benefits" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="الفوائد الرئيسية للمنتج..." rows="3"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">المميزات والفوائد الأساسية</p>
+                        </div>
+
+                        <!-- Usage Recommendations -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">التوصيات وإرشادات الاستخدام</label>
+                            <textarea id="usage_recommendations" name="usage_recommendations" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="التوصيات الفنية والجرعات المناسبة..." rows="3"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">الجرعات والتوقيتات المناسبة</p>
+                        </div>
+
+                        <!-- Safety Notice -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">ملاحظات أمنية وتحذيرات</label>
+                            <textarea id="safety_notice" name="safety_notice" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all resize-none" placeholder="تحذيرات نحو الصحة والسلامة والبيئة..." rows="2"></textarea>
+                            <p class="text-xs text-on-surface-variant mt-1">تحذيرات ومعلومات سلامة حيوية</p>
+                        </div>
+
+                        <!-- Registration Number -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">رقم التسجيل الرسمي</label>
+                            <input id="registration_number" name="registration_number" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all uppercase" placeholder="مثال: REG-2024-001" type="text"/>
+                            <p class="text-xs text-on-surface-variant mt-1">رقم التسجيل من الجهات الرسمية</p>
+                        </div>
+
+                        <!-- FRAC Group -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">مجموعة FRAC (للمبيدات)</label>
+                            <input id="frac_group" name="frac_group" class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm focus:ring-2 focus:ring-primary focus:border-transparent text-right transition-all" placeholder="مثال: Group 4A" type="text"/>
+                            <p class="text-xs text-on-surface-variant mt-1">تصنيف FRAC للمبيدات الفطرية</p>
+                        </div>
+
+                        <!-- Crops Multi-Select -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs sm:text-sm font-bold text-on-surface">المحاصيل المستخدمة</label>
+                            <div class="w-full bg-surface-container-low border border-stone-200 rounded-lg px-3 sm:px-4 py-3 text-xs sm:text-sm max-h-40 overflow-y-auto">
+                                <div class="grid grid-cols-2 gap-2 text-right">
+                                    @forelse(\App\Models\Crop::all() as $crop)
+                                        <label class="flex items-center gap-2 cursor-pointer hover:bg-primary-fixed/10 p-2 rounded">
+                                            <input type="checkbox" name="crops[]" value="{{ $crop->id }}" class="w-4 h-4 accent-primary"/>
+                                            <span>{{ $crop->name }}</span>
+                                        </label>
+                                    @empty
+                                        <p class="text-on-surface-variant col-span-2">لا توجد محاصيل</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                            <p class="text-xs text-on-surface-variant mt-1">اختر المحاصيل التي ينطبق عليها هذا المنتج</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SECTION 4: EXPERT & SUPPLIER ===== -->
                 <div class="border-b border-stone-200 pb-6 sm:pb-8">
                     <div class="flex items-center gap-2 mb-4 sm:mb-6">
                         <span class="material-symbols-outlined text-primary text-lg sm:text-2xl">person</span>
@@ -277,6 +367,30 @@
         document.getElementById('safety_instructions').value = productData.safety_instructions || '';
         document.getElementById('manufacturer_info').value = productData.manufacturer_info || '';
         document.getElementById('data_sheet_url').value = productData.data_sheet_url || '';
+        
+        // New product detail fields
+        document.getElementById('extended_description').value = productData.extended_description || '';
+        document.getElementById('chemical_composition').value = productData.chemical_composition || '';
+        document.getElementById('package_sizes').value = productData.package_sizes || '';
+        document.getElementById('how_it_works').value = productData.how_it_works || '';
+        document.getElementById('benefits').value = productData.benefits || '';
+        document.getElementById('usage_recommendations').value = productData.usage_recommendations || '';
+        document.getElementById('safety_notice').value = productData.safety_notice || '';
+        document.getElementById('registration_number').value = productData.registration_number || '';
+        document.getElementById('frac_group').value = productData.frac_group || '';
+        
+        // Handle crops multi-select
+        if (productData.crops && productData.crops.length > 0) {
+            const cropIds = productData.crops.map(crop => crop.id || crop);
+            document.querySelectorAll('input[name="crops[]"]').forEach(checkbox => {
+                checkbox.checked = cropIds.includes(parseInt(checkbox.value));
+            });
+        } else {
+            document.querySelectorAll('input[name="crops[]"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+        
         document.getElementById('expert_tip').value = productData.expert_tip || '';
         document.getElementById('expert_name').value = productData.expert_name || '';
         document.getElementById('expert_title').value = productData.expert_title || '';

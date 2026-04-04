@@ -123,10 +123,24 @@
     const currentUserId = {{ auth()->id() }};
     const messagesContainer = document.getElementById('messagesContainer');
 
+    // Helper function to wait for Pusher to be initialized
+    function waitForPusher(callback, maxAttempts = 20) {
+        if (typeof window.pusher !== 'undefined') {
+            callback();
+        } else {
+            if (maxAttempts > 0) {
+                console.log('[CustomerChat] Waiting for Pusher... (attempts left: ' + maxAttempts + ')');
+                setTimeout(() => waitForPusher(callback, maxAttempts - 1), 250);
+            } else {
+                console.error('[CustomerChat] Pusher not initialized after timeout');
+            }
+        }
+    }
+
     // Subscribe to conversation channel via Pusher (already initialized in layout)
     @if(config('broadcasting.default') === 'pusher')
-    if (typeof window.pusher !== 'undefined') {
-        const channel = window.pusher.subscribe('private-conversation.' + conversationId);
+    waitForPusher(() => {
+        const channel = window.pusher.subscribe('private-conversation_' + conversationId);
         
         channel.bind('message.sent', (data) => {
             // Don't add our own messages (already added from form submission)
@@ -140,9 +154,7 @@
         });
         
         console.log('[CustomerChat] ✅ Subscribed to conversation');
-    } else {
-        console.warn('[CustomerChat] Pusher not initialized');
-    }
+    });
     @endif
 
     // Send message

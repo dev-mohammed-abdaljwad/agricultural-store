@@ -143,7 +143,7 @@ class OrderController extends Controller
         $user->cartItems()->delete();
 
         ToastService::created('الطلب');
-        return redirect()->route('orders.placed-success', ['order' => $order]);
+        return redirect()->route('customer.orders.placed-success', ['order' => $order]);
     }
 
     /**
@@ -423,7 +423,108 @@ class OrderController extends Controller
      */
     public function createMessage(Request $request, Order $order)
     {
-        // Verify user owns this order
+        // For JSON requests, handle errors as JSON
+        if ($request->expectsJson()) {
+            try {
+                // Verify user owns this order
+                if ($order->customer_id !== auth()->id()) {
+                    return response()->json(['success' => false, 'error' => 'Unauthorized'], 403);
+                }
+
+                $validated = $request->validate([
+                    'message' => 'required|string|max:1000',
+                ]);
+
+                $userId = auth()->id();
+                $adminId = 1; // Default admin user ID
+
+                // Get or create conversation (must be between customer and admin)
+                // Using user_a_id and user_b_id for proper Conversation model
+                $conversation = \App\Models\Conversation::where(function ($q) use ($userId, $adminId) {
+                    $q->where('user_a_id', $userId)
+                      ->where('user_b_id', $adminId);
+                })->orWhere(function ($q) use ($userId, $adminId) {
+                    $q->where('user_a_id', $adminId)
+                      ->where('user_b_id', $userId);
+                })->first();
+
+                if (!$conversation) {
+                    // Also link to order for reference
+                    $conversation = \App\Models\Conversation::create([
+                        'user_a_id' => $userId,
+                        'user_b_id' => $adminId,
+                        'order_id' => $order->id,
+                        'customer_id' => $userId,
+                        'last_message_at' => now(),
+                    ]);
+                }
+
+                // Create the message using proper Message model with 'body' field
+                $message = \App\Models\Message::create([
+                    'conversation_id' => $conversation->id,
+                    'sender_id' => $userId,
+                    'sender_type' => 'customer',
+                    'body' => $validated['message'],
+                    'is_read' => false,
+                ]);
+
+                // Load sender info
+                $message->load('sender:id,name,email');
+
+                // Update conversation timestamp
+                $conversation->update(['last_message_at' => $message->created_at]);
+
+                // Prepare broadcast data
+                $messageData = [
+                    'id' => $message->id,
+                    'conversation_id' => $message->conversation_id,
+                    'sender_id' => $message->sender_id,
+                    'sender_type' => $message->sender_type,
+                    'body' => $message->body,
+                    'attachment_url' => $message->attachment_url,
+                    'attachment_type' => $message->attachment_type,
+                    'is_read' => $message->is_read,
+                    'created_at' => $message->created_at->toIso8601String(),
+                ];
+
+                $senderData = [
+                    'id' => $message->sender->id,
+                    'name' => $message->sender->name,
+                    'email' => $message->sender->email,
+                    'avatar_url' => $message->sender->avatar_url ?? null,
+                ];
+
+                // Broadcast to Pusher for real-time updates
+                \App\Events\MessageSent::dispatch($conversation->id, $messageData, $senderData, $adminId);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => [
+                        ...$messageData,
+                        'sender' => $senderData,
+                    ],
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
+            } catch (\Exception $e) {
+                \Log::error('OrderController::createMessage error', [
+                    'order_id' => $order->id,
+                    'user_id' => auth()->id(),
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        }
+
+        // For form requests
         if ($order->customer_id !== auth()->id()) {
             abort(403, 'Unauthorized');
         }
@@ -432,20 +533,39 @@ class OrderController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        // Get or create conversation for this order
-        $conversation = $order->conversations->first();
+        $userId = auth()->id();
+        $adminId = 1;
+
+        // Get or create conversation
+        $conversation = \App\Models\Conversation::where(function ($q) use ($userId, $adminId) {
+            $q->where('user_a_id', $userId)
+              ->where('user_b_id', $adminId);
+        })->orWhere(function ($q) use ($userId, $adminId) {
+            $q->where('user_a_id', $adminId)
+              ->where('user_b_id', $userId);
+        })->first();
+
         if (!$conversation) {
-            $conversation = $order->conversations()->create([
-                'admin_id' => 1, // Admin user ID (could be the assigned admin)
+            $conversation = \App\Models\Conversation::create([
+                'user_a_id' => $userId,
+                'user_b_id' => $adminId,
+                'order_id' => $order->id,
+                'customer_id' => $userId,
+                'last_message_at' => now(),
             ]);
         }
 
         // Create the message
-        $conversation->messages()->create([
-            'sender_id' => auth()->id(),
+        $message = \App\Models\Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $userId,
             'sender_type' => 'customer',
-            'content' => $validated['message'],
+            'body' => $validated['message'],
+            'is_read' => false,
         ]);
+
+        // Update conversation
+        $conversation->update(['last_message_at' => $message->created_at]);
 
         return back()->with('success', 'تم إرسال الرسالة');
     }

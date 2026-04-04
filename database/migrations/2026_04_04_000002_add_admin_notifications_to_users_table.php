@@ -14,10 +14,18 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Add admin-specific notification preferences if they don't exist
             if (!Schema::hasColumn('users', 'notify_products')) {
-                $table->boolean('notify_products')->default(true)->after('notify_messages');
+                if (Schema::hasColumn('users', 'notify_messages')) {
+                    $table->boolean('notify_products')->default(true)->after('notify_messages');
+                } else {
+                    $table->boolean('notify_products')->default(true);
+                }
             }
             if (!Schema::hasColumn('users', 'notify_reports')) {
-                $table->boolean('notify_reports')->default(true)->after('notify_products');
+                if (Schema::hasColumn('users', 'notify_products')) {
+                    $table->boolean('notify_reports')->default(true)->after('notify_products');
+                } else {
+                    $table->boolean('notify_reports')->default(true);
+                }
             }
         });
     }

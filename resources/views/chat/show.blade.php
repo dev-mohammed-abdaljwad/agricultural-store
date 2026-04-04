@@ -2,12 +2,12 @@
 
 @section('chat-content')
 <div class="h-full overflow-hidden flex flex-col" dir="rtl">
-    <div class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 overflow-hidden flex flex-col">
+    <div class="w-full mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 md:py-6 flex-1 overflow-hidden flex flex-col">
         <!-- Title Header -->
-        <div class="mb-4">
-            <div class="flex items-center gap-4">
+        <div class="mb-3 sm:mb-4">
+            <div class="flex items-center gap-2 sm:gap-4">
                 <div>
-                    <p class="font-semibold text-surface-900">
+                    <p class="font-semibold text-sm sm:text-base md:text-lg text-surface-900">
                         {{ $otherUser->name }}
                     </p>
                     <p class="text-xs text-surface-500">
@@ -18,65 +18,65 @@
         </div>
 
         <!-- Messages container and input area -->
-        <div class="flex-1 overflow-hidden flex flex-col">
+        <div class="flex-1 overflow-hidden flex flex-col gap-2 sm:gap-3">
             <!-- Messages Box -->
-            <div class="bg-white rounded-2xl border border-surface-200 shadow-md overflow-hidden flex flex-col flex-1">
+            <div class="bg-white rounded-lg sm:rounded-xl md:rounded-2xl border border-surface-200 shadow-sm md:shadow-md overflow-hidden flex flex-col flex-1">
                 <!-- Messages Area -->
-                <div class="flex-1 overflow-y-auto space-y-6 pb-6 p-6" id="messagesContainer">
+                <div class="flex-1 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-6 pb-3 sm:pb-4 md:pb-6 p-3 sm:p-4 md:p-6" id="messagesContainer">
             @forelse($conversation->messages as $message)
                 <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-start' : 'justify-end' }} group">
                     @if($message->sender_id === auth()->id())
                         <!-- Sent by current user (Left align) -->
-                        <div class="max-w-xs lg:max-w-md xl:max-w-lg">
-                            <div class="bg-white border border-surface-200 rounded-2xl rounded-tl-sm p-4 shadow-sm">
+                        <div class="max-w-xxs sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
+                            <div class="bg-white border border-surface-200 rounded-lg sm:rounded-xl md:rounded-2xl md:rounded-tl-sm p-2 sm:p-3 md:p-4 shadow-sm">
                                 @if($message->body)
-                                    <p class="text-surface-900 text-sm leading-relaxed break-words">
+                                    <p class="text-surface-900 text-xs sm:text-sm md:text-base leading-relaxed break-words">
                                         {{ $message->body }}
                                     </p>
                                 @endif
 
                                 @if($message->attachment_url)
-                                    <div class="mt-3">
+                                    <div class="mt-2 sm:mt-3">
                                         @if($message->attachment_type === 'image')
-                                            <img src="{{ $message->attachment_url }}" alt="Attachment" class="max-w-full rounded-lg">
+                                            <img src="{{ $message->attachment_url }}" alt="Attachment" class="max-w-full rounded-md sm:rounded-lg">
                                         @else
-                                            <a href="{{ $message->attachment_url }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-surface-50 hover:bg-surface-100 rounded-lg transition">
-                                                <i class="material-symbols-outlined text-base">download</i>
+                                            <a href="{{ $message->attachment_url }}" target="_blank" class="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-surface-50 hover:bg-surface-100 rounded-md sm:rounded-lg transition">
+                                                <i class="material-symbols-outlined text-sm sm:text-base">download</i>
                                                 <span class="text-xs text-surface-700">{{ __('messages.download') }}</span>
                                             </a>
                                         @endif
                                     </div>
                                 @endif
 
-                                <p class="text-xs text-surface-400 mt-2">
+                                <p class="text-xs text-surface-400 mt-1 sm:mt-2">
                                     {{ $message->created_at->format('H:i') }}
                                 </p>
                             </div>
                         </div>
                     @else
                         <!-- Sent by other user (Right align) -->
-                        <div class="max-w-xs lg:max-w-md xl:max-w-lg">
-                            <div class="bg-primary text-white rounded-2xl rounded-tr-sm p-4 shadow-md">
+                        <div class="max-w-xxs sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
+                            <div class="bg-primary text-white rounded-lg sm:rounded-xl md:rounded-2xl md:rounded-tr-sm p-2 sm:p-3 md:p-4 shadow-sm md:shadow-md">
                                 @if($message->body)
-                                    <p class="text-white text-sm leading-relaxed break-words">
+                                    <p class="text-white text-xs sm:text-sm md:text-base leading-relaxed break-words">
                                         {{ $message->body }}
                                     </p>
                                 @endif
 
                                 @if($message->attachment_url)
-                                    <div class="mt-3">
+                                    <div class="mt-2 sm:mt-3">
                                         @if($message->attachment_type === 'image')
-                                            <img src="{{ $message->attachment_url }}" alt="Attachment" class="max-w-full rounded-lg">
+                                            <img src="{{ $message->attachment_url }}" alt="Attachment" class="max-w-full rounded-md sm:rounded-lg">
                                         @else
-                                            <a href="{{ $message->attachment_url }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition">
-                                                <i class="material-symbols-outlined text-base">download</i>
+                                            <a href="{{ $message->attachment_url }}" target="_blank" class="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-white/20 hover:bg-white/30 rounded-md sm:rounded-lg transition">
+                                                <i class="material-symbols-outlined text-sm sm:text-base">download</i>
                                                 <span class="text-xs">{{ __('messages.download') }}</span>
                                             </a>
                                         @endif
                                     </div>
                                 @endif
 
-                                <div class="flex items-center justify-between gap-2 mt-2">
+                                <div class="flex items-center justify-between gap-2 mt-1 sm:mt-2">
                                     <p class="text-xs text-white/70">
                                         {{ $message->created_at->format('H:i') }}
                                     </p>
@@ -89,24 +89,24 @@
                     @endif
                 </div>
             @empty
-                <div class="flex flex-col items-center justify-center py-20 text-center">
-                    <i class="material-symbols-outlined text-6xl text-surface-300 mb-4">chat_bubble_outline</i>
-                    <h3 class="text-lg font-semibold text-surface-900 mb-2">{{ __('messages.no_messages_yet') }}</h3>
-                    <p class="text-surface-500">{{ __('messages.start_conversation') }}</p>
+                <div class="flex flex-col items-center justify-center py-8 sm:py-12 md:py-20 text-center px-4">
+                    <i class="material-symbols-outlined text-4xl sm:text-5xl md:text-6xl text-surface-300 mb-2 sm:mb-3 md:mb-4">chat_bubble_outline</i>
+                    <h3 class="text-base sm:text-lg md:text-xl font-semibold text-surface-900 mb-1 sm:mb-2">{{ __('messages.no_messages_yet') }}</h3>
+                    <p class="text-xs sm:text-sm text-surface-500">{{ __('messages.start_conversation') }}</p>
                 </div>
             @endforelse
                 </div>
             </div>
 
             <!-- Message Input Form -->
-            <div class="border-t border-surface-200 bg-white p-4">
-            <form id="messageForm" class="flex items-end gap-3">
+            <div class="border-t border-surface-200 bg-white p-2 sm:p-3 md:p-4">
+            <form id="messageForm" class="flex items-end gap-2 sm:gap-3">
                 @csrf
 
-                <label class="cursor-pointer">
+                <label class="cursor-pointer flex-shrink-0">
                     <input type="file" id="fileInput" class="hidden" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
-                    <div class="p-2 hover:bg-surface-100 rounded-full transition">
-                        <i class="material-symbols-outlined text-surface-600">attach_file</i>
+                    <div class="p-1.5 sm:p-2 hover:bg-surface-100 rounded-full transition">
+                        <i class="material-symbols-outlined text-sm sm:text-base text-surface-600">attach_file</i>
                     </div>
                 </label>
 
@@ -116,28 +116,28 @@
                         name="body" 
                         id="messageInput"
                         placeholder="{{ __('messages.type_message') }}"
-                        class="w-full px-4 py-3 bg-surface-50 border border-surface-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm bg-surface-50 border border-surface-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
                     >
                 </div>
 
                 <button 
                     type="submit"
-                    class="p-3 bg-primary text-white rounded-full hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="p-1.5 sm:p-2 md:p-3 bg-primary text-white rounded-full hover:bg-primary-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                     id="sendBtn"
                 >
-                    <i class="material-symbols-outlined">send</i>
+                    <i class="material-symbols-outlined text-sm sm:text-base md:text-lg">send</i>
                 </button>
             </form>
 
-            <div id="filePreview" class="mt-3 hidden">
-                <p class="text-xs text-surface-500 flex items-center gap-2">
-                    <i class="material-symbols-outlined text-sm">attach_file</i>
+            <div id="filePreview" class="mt-2 sm:mt-3 hidden">
+                <p class="text-xs text-surface-500 flex items-center gap-1 sm:gap-2">
+                    <i class="material-symbols-outlined text-xs sm:text-sm">attach_file</i>
                     <span id="fileName"></span>
                 </p>
             </div>
 
-            <div id="loadingIndicator" class="mt-3 hidden">
-                <p class="text-xs text-surface-500 flex items-center gap-2">
+            <div id="loadingIndicator" class="mt-2 sm:mt-3 hidden">
+                <p class="text-xs text-surface-500 flex items-center gap-1 sm:gap-2">
                     <span class="inline-block w-2 h-2 bg-primary rounded-full animate-pulse"></span>
                     {{ __('messages.sending') }}
                 </p>
@@ -268,9 +268,23 @@
     }
 
     @if(config('broadcasting.default') === 'pusher')
+        // Helper function to wait for Pusher to be initialized
+        function waitForPusher(callback, maxAttempts = 20) {
+            if (typeof window.pusher !== 'undefined') {
+                callback();
+            } else {
+                if (maxAttempts > 0) {
+                    console.log('[FullPageChat] Waiting for Pusher... (attempts left: ' + maxAttempts + ')');
+                    setTimeout(() => waitForPusher(callback, maxAttempts - 1), 250);
+                } else {
+                    console.error('[FullPageChat] Pusher not initialized after timeout');
+                }
+            }
+        }
+
         // Subscribe to conversation channel via Pusher WebSocket (not Echo)
-        if (typeof window.pusher !== 'undefined') {
-            const channel = window.pusher.subscribe('private-conversation.{{ $conversation->id }}');
+        waitForPusher(() => {
+            const channel = window.pusher.subscribe('private-conversation_{{ $conversation->id }}');
             
             channel.bind('message.sent', (event) => {
                 // Don't add our own messages (already added from response)
@@ -285,9 +299,7 @@
             });
             
             console.log('[FullPageChat] ✅ Subscribed to conversation via Pusher');
-        } else {
-            console.warn('[FullPageChat] Pusher not initialized');
-        }
+        });
     @endif
 </script>
 @endpush

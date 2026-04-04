@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
         <!-- Left Column: Benefits (Editorial Style) -->
         <section class="lg:col-span-5 space-y-8 md:space-y-12 order-2 lg:order-1">
-            <div class="relative rounded-2xl overflow-hidden aspect-[4/5] editorial-shadow">
+            <div class="relative rounded-2xl overflow-hidden editorial-shadow">
                 <img 
                     alt="Egyptian Farmer" 
                     class="absolute inset-0 w-full h-full object-cover" 

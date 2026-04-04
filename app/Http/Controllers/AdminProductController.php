@@ -200,7 +200,7 @@ class AdminProductController extends Controller
     }
 
     /**
-     * Remove the specified product from storage AND RETRUN TO PRODUCT INDEX PAGE 
+     * Remove the specified product from storage AND RETURN TO PRODUCT INDEX PAGE 
      */
     public function destroy(Request $request, Product $product)
     {
@@ -217,9 +217,9 @@ class AdminProductController extends Controller
             ], 200);
         }
 
-        // Fallback to redirect for non-AJAX requests
+        // Fallback to redirect for non-AJAX requests - return to admin products index
         return redirect()
-            ->route('products.index')
+            ->route('admin.products.index')
             ->with('success', 'تم حذف المنتج بنجاح');
     }
 }

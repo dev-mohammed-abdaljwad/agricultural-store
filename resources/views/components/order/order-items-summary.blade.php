@@ -14,7 +14,7 @@
             {{-- Item Card --}}
             <div class="bg-surface-container-lowest p-4 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-6 group hover:bg-surface transition-colors duration-300">
                 {{-- Product Image --}}
-                <div class="w-24 h-24 sm:w-28 md:w-32 sm:h-28 md:h-32 flex-shrink-0 bg-surface-container-low overflow-hidden flex items-center justify-center rounded-lg">
+                <div class="w-full h-40 sm:w-40 md:w-48 sm:h-40 md:h-48 flex-shrink-0 bg-surface-container-low overflow-hidden flex items-center justify-center rounded-lg">
                     @if($item['image'] ?? null)
                         <img 
                             alt="{{ $item['name'] ?? 'منتج' }}" 

@@ -3,7 +3,7 @@
 
 <div class="bg-surface-container-lowest p-3 md:p-4 rounded-xl flex flex-col sm:flex-row gap-3 md:gap-4 shadow-[0_4px_24px_rgba(21,66,18,0.04)] group transition-all hover:translate-y-[-2px]">
     {{-- Product Image --}}
-    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-surface-container overflow-hidden shrink-0 flex items-center justify-center">
+    <div class="w-full h-40 sm:w-24 sm:h-24 rounded-lg bg-surface-container overflow-hidden sm:shrink-0 flex items-center justify-center">
         @if($item['image'] ?? null)
             <img 
                 alt="{{ $item['name'] ?? 'منتج' }}" 

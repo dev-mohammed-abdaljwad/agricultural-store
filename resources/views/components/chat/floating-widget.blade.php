@@ -216,7 +216,7 @@ const chatWidget = {
         if (this.echoListeners[conversationId]) return;
 
         try {
-            const channel = Echo.private(`conversation.${conversationId}`);
+            const channel = Echo.private(`conversation_${conversationId}`);
 
             channel.listen('.message.sent', (data) => {
                 this.handleIncomingMessage(data, conversationId);
@@ -233,7 +233,7 @@ const chatWidget = {
         if (!this.echoListeners[conversationId]) return;
 
         try {
-            Echo.leaveChannel(`conversation.${conversationId}`);
+            Echo.leaveChannel(`conversation_${conversationId}`);
             delete this.echoListeners[conversationId];
             console.log('[ChatWidget] Unsubscribed from conversation:', conversationId);
         } catch (err) {

@@ -141,6 +141,35 @@
             </div>
         </div>
 
+        <!-- Management Links -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Products Management -->
+            <a href="{{ route('admin.products.index') }}" class="bg-surface-container-low p-4 lg:p-6 rounded-2xl border border-outline-variant hover:shadow-lg transition-all group">
+                <div class="flex items-start gap-3 justify-between flex-row-reverse">
+                    <div>
+                        <h4 class="font-bold text-primary mb-1 group-hover:text-primary/90">إدارة المنتجات</h4>
+                        <p class="text-xs text-on-surface-variant">{{ \App\Models\Product::count() }} منتج نشط</p>
+                    </div>
+                    <div class="p-2 bg-tertiary-fixed rounded-lg text-tertiary flex-shrink-0">
+                        <span class="material-symbols-outlined">shopping_bag</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Categories Management -->
+            <a href="{{ route('admin.categories.index') }}" class="bg-surface-container-low p-4 lg:p-6 rounded-2xl border border-outline-variant hover:shadow-lg transition-all group">
+                <div class="flex items-start gap-3 justify-between flex-row-reverse">
+                    <div>
+                        <h4 class="font-bold text-primary mb-1 group-hover:text-primary/90">إدارة الفئات</h4>
+                        <p class="text-xs text-on-surface-variant">{{ \App\Models\Category::whereNull('parent_id')->count() }} فئة رئيسية</p>
+                    </div>
+                    <div class="p-2 bg-secondary-container rounded-lg text-secondary flex-shrink-0">
+                        <span class="material-symbols-outlined">category</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
         <!-- Stats Card -->
         <div class="bg-surface-container-low p-4 lg:p-6 rounded-3xl border border-outline-variant/5">
             <h4 class="font-black text-primary mb-3 lg:mb-4 flex items-center gap-2 text-base lg:text-lg">

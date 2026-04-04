@@ -47,10 +47,10 @@
         <!-- Product Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
             @forelse($products as $product)
-                <div class="group bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col">
-                    <div class="relative aspect-square rounded-xl overflow-hidden mb-6">
+                <a href="{{ route('products.show', $product) }}" class="group bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 flex flex-col cursor-pointer">
+                    <div class="relative rounded-xl overflow-hidden mb-6">
                         @if($product->images->first())
-                            <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                            <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 " 
                                  alt="{{ $product->name }}"
                                  src="{{ $product->images->first()->asset_url }}" />
                         @else
@@ -65,15 +65,12 @@
                             </div>
                         @endif
                     </div>
-                    <span class="text-on-surface-variant text-xs font-headline mb-1">{{ $product->category->name }}</span>
-                    <h3 class="text-lg font-black text-primary font-headline mb-4 leading-tight">{{ $product->name }}</h3>
-                    <div class="mt-auto">
-                        <a href="{{ route('products.show', $product) }}"
-                           class="w-full py-3 bg-primary-fixed text-on-primary-fixed font-bold rounded-xl font-headline transition-all active:scale-95 hover:bg-primary-fixed/90 text-center block">
-                            اطلب عرض سعر
-                        </a>
-                    </div>
-                </div>
+                    <span class="text-on-surface-variant text-sm font-bold font-headline mb-2 text-lg">{{ $product->category->name }}</span>
+                    <h3 class="text-lg font-black text-primary font-headline mb-2 leading-tight">{{ $product->name }}</h3>
+                    @if($product->chemical_composition)
+                        <p class="text-on-surface-variant text-sm font-headline mb-4">{{ $product->chemical_composition }}</p>
+                    @endif
+                </a>
             @empty
                 <div class="col-span-full text-center py-16">
                     <span class="material-symbols-outlined text-6xl text-on-surface-variant opacity-20 block mb-4">

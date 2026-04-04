@@ -17,7 +17,7 @@
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-12 items-start mb-16">
                 <!-- LEFT: IMAGE GALLERY -->
                 <div class="xl:col-span-7">
-                    <div class="relative rounded-xl overflow-hidden shadow-sm bg-surface-container-lowest aspect-[4/3] group">
+                    <div class="relative rounded-xl overflow-hidden shadow-sm bg-surface-container-lowest w-full group">
                         <!-- Certified Badge -->
                         @if($product->is_certified)
                             <div class="absolute top-4 right-4 z-10">
@@ -46,7 +46,7 @@
                         <div class="grid grid-cols-4 gap-4 mt-4">
                             @foreach($product->images->take(4) as $index => $image)
                                 <button onclick="document.getElementById('mainImage').src='{{ $image->asset_url }}'"
-                                        class="aspect-square rounded-lg overflow-hidden {{ $index === 0 ? 'border-2 border-primary-fixed' : 'border border-outline-variant hover:bg-surface-container-high' }} transition-colors cursor-pointer">
+                                        class="rounded-lg overflow-hidden {{ $index === 0 ? 'border-2 border-primary-fixed' : 'border border-outline-variant hover:bg-surface-container-high' }} transition-colors cursor-pointer">
                                     <img src="{{ $image->asset_url }}" 
                                          alt="{{ $product->name }}"
                                          class="w-full h-full object-cover">
@@ -54,7 +54,7 @@
                             @endforeach
 
                             @if($product->images->count() > 4)
-                                <div class="aspect-square rounded-lg overflow-hidden border border-outline-variant relative flex items-center justify-center bg-surface-container-low">
+                                <div class="rounded-lg overflow-hidden border border-outline-variant relative flex items-center justify-center bg-surface-container-low">
                                     <img src="{{ $product->images->get(4)?->asset_url }}" 
                                          alt="{{ $product->name }}"
                                          class="w-full h-full object-cover opacity-40">
@@ -104,21 +104,7 @@
                             </div>
                         </form>
 
-                        <!-- Shipping Info Box -->
-                        <div class="bg-surface-container-highest/50 p-4 rounded-lg border-r-4 border-tertiary space-y-3">
-                            <div class="flex items-center gap-2 flex-row-reverse">
-                                <span class="material-symbols-outlined text-tertiary">local_shipping</span>
-                                <span class="font-bold text-sm">{{ $product->shipping_partner ?? 'شركة النصر للخدمات اللوجستية' }}</span>
-                            </div>
-                            <p class="text-xs text-on-surface-variant leading-relaxed">{{ $product->shipping_note ?? 'خدمة توصيل سريعة وآمنة لجميع محافظات مصر' }}</p>
-                            @if(isset($product->shipping_regions) && is_array($product->shipping_regions))
-                                <div class="flex gap-2 flex-wrap">
-                                    @foreach($product->shipping_regions as $region)
-                                        <span class="bg-primary-fixed/30 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold">{{ $region }}</span>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
+                      
                     </div>
                 </div>
             </div>
@@ -129,6 +115,12 @@
                 <div class="flex gap-8 border-b border-outline-variant/20 mb-8 overflow-x-auto" style="scrollbar-width: none;">
                     <button data-tab="specs" class="tab-btn active text-primary font-bold border-b-2 border-primary pb-4 whitespace-nowrap text-sm md:text-base cursor-pointer">
                         المواصفات الفنية
+                    </button>
+                    <button data-tab="composition" class="tab-btn text-on-surface-variant font-medium hover:text-primary whitespace-nowrap pb-4 text-sm md:text-base cursor-pointer transition-colors">
+                        التركيب والمحاصيل
+                    </button>
+                    <button data-tab="benefits" class="tab-btn text-on-surface-variant font-medium hover:text-primary whitespace-nowrap pb-4 text-sm md:text-base cursor-pointer transition-colors">
+                        الفوائد والاستخدام
                     </button>
                     <button data-tab="usage" class="tab-btn text-on-surface-variant font-medium hover:text-primary whitespace-nowrap pb-4 text-sm md:text-base cursor-pointer transition-colors">
                         طريقة الاستخدام
@@ -158,6 +150,28 @@
                                 @else
                                     <p class="text-on-surface-variant">لا توجد مواصفات متاحة</p>
                                 @endif
+
+                                <!-- Display additional product fields -->
+                                @if($product->registration_number)
+                                    <div class="flex justify-between py-3 border-b border-outline-variant/10">
+                                        <span class="text-on-surface-variant">رقم التسجيل</span>
+                                        <span class="font-bold text-on-surface">{{ $product->registration_number }}</span>
+                                    </div>
+                                @endif
+
+                                @if($product->frac_group)
+                                    <div class="flex justify-between py-3 border-b border-outline-variant/10">
+                                        <span class="text-on-surface-variant">مجموعة FRAC</span>
+                                        <span class="font-bold text-on-surface">{{ $product->frac_group }}</span>
+                                    </div>
+                                @endif
+
+                                @if($product->package_sizes)
+                                    <div class="flex justify-between py-3 border-b border-outline-variant/10">
+                                        <span class="text-on-surface-variant">أحجام الحزم</span>
+                                        <span class="font-bold text-on-surface">{{ $product->package_sizes }}</span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -185,6 +199,105 @@
                             @endif
                         </div>
                     </div>
+                </div>
+
+                <!-- COMPOSITION & CROPS TAB -->
+                <div id="tab-composition" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Left: Chemical Composition -->
+                        <div class="space-y-6">
+                            @if($product->chemical_composition)
+                                <div>
+                                    <h3 class="text-xl font-black text-primary mb-4 font-headline">التركيب الكيميائي</h3>
+                                    <div class="bg-surface-container-low p-6 rounded-xl">
+                                        <p class="text-on-surface-variant leading-relaxed whitespace-pre-line">{{ $product->chemical_composition }}</p>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($product->how_it_works)
+                                <div>
+                                    <h3 class="text-xl font-black text-primary mb-4 font-headline">كيفية العمل</h3>
+                                    <div class="bg-surface-container-low p-6 rounded-xl">
+                                        <p class="text-on-surface-variant leading-relaxed whitespace-pre-line">{{ $product->how_it_works }}</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Right: Crops & Additional Info -->
+                        <div class="space-y-6">
+                            @if($product->crops && $product->crops->count() > 0)
+                                <div>
+                                    <h3 class="text-xl font-black text-primary mb-4 font-headline">المحاصيل المستخدمة</h3>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        @foreach($product->crops as $crop)
+                                            <div class="bg-primary-fixed/20 text-primary px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                                                <span class="material-symbols-outlined text-sm">check_circle</span>
+                                                {{ $crop->name }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($product->extended_description)
+                                <div>
+                                    <h3 class="text-lg font-black text-primary mb-3 font-headline">معلومات إضافية</h3>
+                                    <div class="bg-surface-container-low p-4 rounded-xl">
+                                        <p class="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{{ $product->extended_description }}</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BENEFITS & RECOMMENDATIONS TAB -->
+                <div id="tab-benefits" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Left: Benefits -->
+                        @if($product->benefits)
+                            <div>
+                                <h3 class="text-xl font-black text-primary mb-4 font-headline">الفوائد الرئيسية</h3>
+                                <div class="bg-surface-container-low p-6 rounded-xl">
+                                    <div class="space-y-3">
+                                        @php
+                                            $benefits = explode("\n", $product->benefits);
+                                        @endphp
+                                        @foreach($benefits as $benefit)
+                                            @if(trim($benefit))
+                                                <div class="flex gap-3 items-start flex-row-reverse">
+                                                    <span class="material-symbols-outlined text-primary text-xl flex-shrink-0">check_circle</span>
+                                                    <p class="text-on-surface-variant text-sm leading-relaxed">{{ trim($benefit) }}</p>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Right: Usage Recommendations -->
+                        @if($product->usage_recommendations)
+                            <div>
+                                <h3 class="text-xl font-black text-primary mb-4 font-headline">التوصيات وإرشادات الاستخدام</h3>
+                                <div class="bg-surface-container-low p-6 rounded-xl">
+                                    <p class="text-on-surface-variant leading-relaxed whitespace-pre-line text-sm">{{ $product->usage_recommendations }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if($product->safety_notice)
+                        <div class="mt-8 bg-error-fixed/20 border-r-4 border-error p-6 rounded-xl">
+                            <h3 class="text-lg font-black text-error mb-3 font-headline flex items-center gap-2 flex-row-reverse">
+                                <span class="material-symbols-outlined">warning</span>
+                                ملاحظات أمنية مهمة
+                            </h3>
+                            <p class="text-on-surface-variant leading-relaxed whitespace-pre-line text-sm">{{ $product->safety_notice }}</p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- OTHER TABS (Hidden by default) -->
@@ -225,7 +338,7 @@
                         @foreach($relatedProducts as $related)
                             <a href="{{ route('products.show', $related) }}" class="bg-surface-container-lowest p-4 rounded-xl shadow-sm hover:shadow-md transition-all group">
                                 <!-- Image -->
-                                <div class="relative aspect-square overflow-hidden rounded-lg mb-4 bg-surface-container-low flex items-center justify-center">
+                                <div class="relative overflow-hidden rounded-lg mb-4 bg-surface-container-low flex items-center justify-center">
                                     @if($related->images->first()?->asset_url)
                                         <img src="{{ $related->images->first()->asset_url }}" 
                                              alt="{{ $related->name }}"

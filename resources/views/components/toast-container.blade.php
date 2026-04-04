@@ -16,7 +16,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 transform translate-y-0"
         x-transition:leave-end="opacity-0 transform translate-y-2"
-        x-init="setTimeout(() => show = false, 4000)"
+        x-init="setTimeout(() => show = false, 2000)"
         @click="show = false"
         class="fixed bottom-6 right-6 z-50 max-w-md cursor-pointer"
     >
