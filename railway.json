@@ -1,0 +1,8 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "nixpacks": {
+      "providers": ["php", "npm"]
+    }
+  }
+}
