@@ -24,9 +24,37 @@
                 <!-- Messages Area -->
                 <div class="flex-1 overflow-y-auto space-y-3 sm:space-y-4 md:space-y-6 pb-3 sm:pb-4 md:pb-6 p-3 sm:p-4 md:p-6" id="messagesContainer">
             @forelse($conversation->messages as $message)
-                <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-start' : 'justify-end' }} group">
+                <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }} group">
                     @if($message->sender_id === auth()->id())
-                        <!-- Sent by current user (Left align) -->
+                        <!-- Sent by current user (Right align - Green) -->
+                        <div class="max-w-xxs sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
+                            <div class="bg-primary text-white rounded-lg sm:rounded-xl md:rounded-2xl md:rounded-tr-sm p-2 sm:p-3 md:p-4 shadow-sm md:shadow-md">
+                                @if($message->body)
+                                    <p class="text-white text-xs sm:text-sm md:text-base leading-relaxed break-words">
+                                        {{ $message->body }}
+                                    </p>
+                                @endif
+
+                                @if($message->attachment_url)
+                                    <div class="mt-2 sm:mt-3">
+                                        @if($message->attachment_type === 'image')
+                                            <img src="{{ $message->attachment_url }}" alt="Attachment" class="max-w-full rounded-md sm:rounded-lg">
+                                        @else
+                                            <a href="{{ $message->attachment_url }}" target="_blank" class="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-white/20 hover:bg-white/30 rounded-md sm:rounded-lg transition">
+                                                <i class="material-symbols-outlined text-sm sm:text-base">download</i>
+                                                <span class="text-xs">{{ __('messages.download') }}</span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <p class="text-xs text-white/70 mt-1 sm:mt-2">
+                                    {{ $message->created_at->format('H:i') }}
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Sent by other user (Left align - White) -->
                         <div class="max-w-xxs sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
                             <div class="bg-white border border-surface-200 rounded-lg sm:rounded-xl md:rounded-2xl md:rounded-tl-sm p-2 sm:p-3 md:p-4 shadow-sm">
                                 @if($message->body)
@@ -51,39 +79,6 @@
                                 <p class="text-xs text-surface-400 mt-1 sm:mt-2">
                                     {{ $message->created_at->format('H:i') }}
                                 </p>
-                            </div>
-                        </div>
-                    @else
-                        <!-- Sent by other user (Right align) -->
-                        <div class="max-w-xxs sm:max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
-                            <div class="bg-primary text-white rounded-lg sm:rounded-xl md:rounded-2xl md:rounded-tr-sm p-2 sm:p-3 md:p-4 shadow-sm md:shadow-md">
-                                @if($message->body)
-                                    <p class="text-white text-xs sm:text-sm md:text-base leading-relaxed break-words">
-                                        {{ $message->body }}
-                                    </p>
-                                @endif
-
-                                @if($message->attachment_url)
-                                    <div class="mt-2 sm:mt-3">
-                                        @if($message->attachment_type === 'image')
-                                            <img src="{{ $message->attachment_url }}" alt="Attachment" class="max-w-full rounded-md sm:rounded-lg">
-                                        @else
-                                            <a href="{{ $message->attachment_url }}" target="_blank" class="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-white/20 hover:bg-white/30 rounded-md sm:rounded-lg transition">
-                                                <i class="material-symbols-outlined text-sm sm:text-base">download</i>
-                                                <span class="text-xs">{{ __('messages.download') }}</span>
-                                            </a>
-                                        @endif
-                                    </div>
-                                @endif
-
-                                <div class="flex items-center justify-between gap-2 mt-1 sm:mt-2">
-                                    <p class="text-xs text-white/70">
-                                        {{ $message->created_at->format('H:i') }}
-                                    </p>
-                                    @if($message->is_read)
-                                        <i class="material-symbols-outlined text-xs">done_all</i>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     @endif
@@ -255,11 +250,11 @@
         const time = new Date(message.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
 
         const messageHTML = `
-            <div class="flex ${isOwn ? 'justify-start' : 'justify-end'}">
-                <div class="max-w-xs lg:max-w-md ${isOwn ? 'bg-white border border-surface-200' : 'bg-primary text-white'} rounded-2xl ${isOwn ? 'rounded-tl-sm' : 'rounded-tr-sm'} p-4 shadow-${isOwn ? 'sm' : 'md'}">
+            <div class="flex ${isOwn ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-xs lg:max-w-md ${isOwn ? 'bg-primary text-white' : 'bg-white border border-surface-200'} rounded-2xl ${isOwn ? 'rounded-tr-sm' : 'rounded-tl-sm'} p-4 shadow-${isOwn ? 'md' : 'sm'}">
                     ${message.body ? `<p class="text-sm leading-relaxed break-words">${message.body}</p>` : ''}
                     ${attachmentHTML}
-                    <p class="text-xs ${isOwn ? 'text-surface-400' : 'text-white/70'} mt-2">${time}</p>
+                    <p class="text-xs ${isOwn ? 'text-white/70' : 'text-surface-400'} mt-2">${time}</p>
                 </div>
             </div>
         `;
@@ -283,6 +278,7 @@
         }
 
         // Subscribe to conversation channel via Pusher WebSocket (not Echo)
+        @if(config('broadcasting.default') === 'pusher')
         waitForPusher(() => {
             const channel = window.pusher.subscribe('private-conversation_{{ $conversation->id }}');
             
@@ -300,6 +296,7 @@
             
             console.log('[FullPageChat] ✅ Subscribed to conversation via Pusher');
         });
+    @endif
     @endif
 </script>
 @endpush

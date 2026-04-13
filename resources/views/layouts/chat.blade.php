@@ -82,7 +82,8 @@
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Direct Pusher Initialization (loaded before Vite scripts) -->
+    <!-- Direct Pusher Initialization (only if using Pusher) -->
+    @if(config('broadcasting.default') === 'pusher')
     <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
     <script>
         // Initialize Pusher immediately when library is loaded
@@ -125,6 +126,7 @@
             window.addEventListener('load', initPusher);
         }
     </script>
+    @endif
 </head>
 <body class="bg-surface antialiased">
     <x-toast-container />
@@ -395,6 +397,7 @@
         };
 
         // Auto-log status after a short delay
+        @if(config('broadcasting.default') === 'pusher')
         setTimeout(() => {
             if (typeof window.pusher === 'undefined') {
                 console.warn('⚠️ Pusher not yet initialized. Run `window.checkPusherStatus()` to diagnose.');
@@ -402,6 +405,9 @@
                 console.log('✅ Pusher ready! Status:', window.checkPusherStatus());
             }
         }, 1000);
+        @else
+        console.log('[Broadcasting] Using {{ config("broadcasting.default") }} driver (Pusher disabled)');
+        @endif
     </script>
 
     @stack('scripts')

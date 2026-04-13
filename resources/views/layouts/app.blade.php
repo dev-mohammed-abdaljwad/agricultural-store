@@ -127,15 +127,16 @@
     
     @yield('content')
     
-    <!-- Pusher JavaScript SDK -->
+    <!-- Pusher JavaScript SDK (only if using Pusher) -->
     @auth
+        @if(config('broadcasting.default') === 'pusher')
         <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
         
         <!-- Initialize Pusher -->
         <script>
-            if ('{{ env("BROADCAST_DRIVER") }}' === 'pusher') {
-                window.pusher = new Pusher('{{ env("PUSHER_APP_KEY") }}', {
-                    cluster: '{{ env("PUSHER_APP_CLUSTER", "eu") }}',
+            if (typeof Pusher !== 'undefined') {
+                window.pusher = new Pusher('{{ config("broadcasting.connections.pusher.key") }}', {
+                    cluster: '{{ config("broadcasting.connections.pusher.options.cluster", "eu") }}',
                     forceTLS: true,
                     authEndpoint: '/broadcasting/auth',
                     auth: {
@@ -144,11 +145,16 @@
                         }
                     }
                 });
-                console.log('[Pusher] ✅ Initialized with cluster: {{ env("PUSHER_APP_CLUSTER", "eu") }}');
+                console.log('[Pusher] ✅ Initialized with cluster: {{ config("broadcasting.connections.pusher.options.cluster", "eu") }}');
             } else {
-                console.warn('[Pusher] Broadcast driver is not Pusher, real-time features may be unavailable');
+                console.error('[Pusher] Pusher library failed to load');
             }
         </script>
+        @else
+        <script>
+            console.log('[Broadcasting] Using {{ config("broadcasting.default") }} driver (Pusher disabled)');
+        </script>
+        @endif
         
         <!-- Chat Pusher Integration (deprecated - using full-page chat views instead) -->
         <!-- Disabled: PopupManager and auto-popup features -->

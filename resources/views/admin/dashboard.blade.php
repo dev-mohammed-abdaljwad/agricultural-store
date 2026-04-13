@@ -323,38 +323,5 @@
 
 <x-product-modal />
 
-<script>
-    const uploadArea = document.querySelector('.border-dashed');
-    
-    uploadArea?.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('bg-primary-fixed/20');
-    });
-
-    uploadArea?.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('bg-primary-fixed/20');
-    });
-
-    uploadArea?.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('bg-primary-fixed/20');
-        if (e.dataTransfer.files.length) {
-            imageInput.files = e.dataTransfer.files;
-            previewImage({ target: { files: e.dataTransfer.files } });
-        }
-    });
-
-    // Form validation before submit
-    document.getElementById('productForm')?.addEventListener('submit', function(e) {
-        const name = this.querySelector('[name="name"]').value.trim();
-        const categoryId = this.querySelector('[name="category_id"]').value.trim();
-        
-        if (!name || !categoryId) {
-            e.preventDefault();
-            showError('يرجى ملء الحقول المطلوبة (اسم المنتج والفئة)');
-        }
-    });
-</script>
-
 @endsection
 

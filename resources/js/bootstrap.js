@@ -15,14 +15,10 @@ function initializePusher() {
     // Get Pusher credentials from meta tags
     const pusherKey = document.querySelector('meta[name="pusher-key"]')?.content;
     const pusherCluster = document.querySelector('meta[name="pusher-cluster"]')?.content;
-    const pusherHost = document.querySelector('meta[name="pusher-host"]')?.content;
-    const pusherPort = document.querySelector('meta[name="pusher-port"]')?.content;
 
     // Check if we have required credentials
     if (!pusherKey || !pusherCluster) {
-        console.warn('⚠️ Pusher credentials not found in meta tags. Check config/broadcasting.php');
-        console.warn('  pusherKey:', pusherKey);
-        console.warn('  pusherCluster:', pusherCluster);
+        console.warn('⚠️ Pusher credentials not found in meta tags. Check .env file.');
         
         // Retry after a delay in case DOM wasn't ready
         if (document.readyState !== 'complete') {
@@ -39,9 +35,6 @@ function initializePusher() {
             broadcaster: 'pusher',
             key: pusherKey,
             cluster: pusherCluster,
-            wsHost: pusherHost,
-            wsPort: pusherPort || 80,
-            wssPort: pusherPort || 443,
             forceTLS: true,
             enabledTransports: ['ws', 'wss'],
         });
@@ -52,10 +45,9 @@ function initializePusher() {
             forceTLS: true,
         });
 
-        console.log('✅ Pusher initialized successfully with key:', pusherKey.substring(0, 10) + '...');
+        console.log('✅ Pusher initialized successfully');
     } catch (error) {
         console.error('❌ Error initializing Pusher:', error);
-        console.error('  Check that pusher-js is installed: npm install pusher-js');
     }
 }
 

@@ -48,9 +48,9 @@
             <!-- Messages Area -->
             <div id="messagesContainer" class="flex-1 overflow-y-auto p-6 bg-surface-50 space-y-4">
                 @forelse($messages as $message)
-                    <div class="flex {{ $message->sender_type === 'customer' ? 'justify-end' : 'justify-start' }}">
+                    <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                         <div class="max-w-xs lg:max-w-md">
-                            <div class="flex items-end {{ $message->sender_type === 'customer' ? 'flex-row-reverse' : 'flex-row' }} gap-2">
+                            <div class="flex items-end {{ $message->sender_id === auth()->id() ? 'flex-row-reverse' : 'flex-row' }} gap-2">
                                 <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                     {{ substr($message->sender->name, 0, 1) }}
                                 </div>
@@ -59,7 +59,7 @@
                                         {{ $message->sender->name }}
                                     </div>
                                     @if($message->body)
-                                        <div class="px-4 py-3 rounded-2xl {{ $message->sender_type === 'customer' ? 'bg-primary text-white' : 'bg-surface-200' }}">
+                                        <div class="px-4 py-3 rounded-2xl {{ $message->sender_id === auth()->id() ? 'bg-primary text-white' : 'bg-white border border-surface-200 text-on-surface' }}">
                                             <p class="text-sm break-words">{{ $message->body }}</p>
                                         </div>
                                     @endif

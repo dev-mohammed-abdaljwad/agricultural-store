@@ -82,7 +82,7 @@
                                                 @endif
                                             </div>
                                             @if($message->body)
-                                                <div class="px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl md:rounded-2xl {{ $message->sender_type === 'admin' ? 'bg-primary text-white' : 'bg-surface-200' }}">
+                                                <div class="px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl md:rounded-2xl {{ $message->sender_type === 'admin' ? 'bg-primary text-white' : 'bg-white border border-surface-200 text-on-surface' }}">
                                                     <p class="text-xs sm:text-sm break-words">{{ $message->body }}</p>
                                                 </div>
                                             @endif

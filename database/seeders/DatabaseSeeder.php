@@ -74,7 +74,9 @@ class DatabaseSeeder extends Seeder
 
       
         // call category seeder
-        $this->call(CategorySeeder::class);
+        $this->call([CategorySeeder::class,
+            CropSeeder::class,]
+            );
         
        
     }
